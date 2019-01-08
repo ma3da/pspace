@@ -1,0 +1,27 @@
+{% load static %}
+
+<script src="https://unpkg.com/vue"></script>
+
+<p><a href="{% url 'timetable:new' %}">add activity</a></p>
+
+{% if weekly_blocks %}
+    <ul>
+    {% for block in weekly_blocks %}
+        <li>{{ block.place }} <a href="{% url 'timetable:delete' block.id %}">del</a>
+            <br/>
+            {{ block.activity.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No activity found.</p>
+{% endif %}
+
+<script>
+    new Vue({
+  delimiters: ['[[', ']]'],
+  el: '#app',
+  data: {
+    blocky: {{ weekly_blocks }}
+  }
+})
+</script>
