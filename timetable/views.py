@@ -1,13 +1,19 @@
 import datetime
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Block, Activity, Place
 from .forms import BlockForm
+from .serializers import ActivitySerializer, BlockSerializer
 
 
 class IndexView(generic.ListView):
@@ -52,3 +58,30 @@ def new(request):
 def delete(request, block_id):
     Block.objects.get(pk=block_id).delete()
     return HttpResponseRedirect(reverse("timetable:index"))
+
+
+class ActivityList(APIView):
+    def get(self, request, format=None):
+        activities = Activity.objects.all()
+        serializer = ActivitySerializer(activities, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = ActivitySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+
+class ActivityDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Block.objects.get(pk=pk)
+        except Block.DoesNotExist:
+            print("mayday")
+            return Http404
+
+    def get(self, request, pk, format=None):
+        serializer = BlockSerializer(self.get_object(pk))
+        return Response(serializer.data)
