@@ -60,26 +60,25 @@ def delete(request, block_id):
     return HttpResponseRedirect(reverse("timetable:index"))
 
 
-class ActivityList(APIView):
+class BlockList(APIView):
     def get(self, request, format=None):
-        activities = Activity.objects.all()
-        serializer = ActivitySerializer(activities, many=True)
+        activities = Block.objects.all()
+        serializer = BlockSerializer(activities, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer = ActivitySerializer(data=request.data)
+        serializer = BlockSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 
-class ActivityDetail(APIView):
+class BlockDetail(APIView):
     def get_object(self, pk):
         try:
             return Block.objects.get(pk=pk)
         except Block.DoesNotExist:
-            print("mayday")
             return Http404
 
     def get(self, request, pk, format=None):

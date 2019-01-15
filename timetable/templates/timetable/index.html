@@ -1,27 +1,42 @@
 {% load static %}
 
-<script src="https://unpkg.com/vue"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>
 
 <p><a href="{% url 'timetable:new' %}">add activity</a></p>
 
-{% if weekly_blocks %}
-    <ul>
-    {% for block in weekly_blocks %}
-        <li>{{ block.place }} <a href="{% url 'timetable:delete' block.id %}">del</a>
-            <br/>
-            {{ block.activity.name }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No activity found.</p>
-{% endif %}
+<!--{% if weekly_blocks %}-->
+<!--<ul>-->
+<!--{% for block in weekly_blocks %}-->
+<!--<li>{{ block.place }} <a href="{% url 'timetable:delete' block.id %}">del</a>-->
+<!--<br/>-->
+<!--{{ block.activity.name }}</li>-->
+<!--{% endfor %}-->
+<!--</ul>-->
+<!--{% else %}-->
+<!--<p>No activity found.</p>-->
+<!--{% endif %}-->
+
+<ul id="app">
+    <li v-for="block in blocks"> [[ block.activity.name ]], [[ block.place]] </li>
+</ul>
 
 <script>
     new Vue({
-  delimiters: ['[[', ']]'],
-  el: '#app',
-  data: {
-    blocky: {{ weekly_blocks }}
-  }
-})
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            blocks: []
+        },
+        methods: {
+            getShit () {
+                axios
+                  .get('/tt/api/blocks.json')
+                  .then(response => (this.blocks = response.data));
+            }
+        },
+        mounted() {
+            this.getShit();
+        }
+    })
 </script>
