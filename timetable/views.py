@@ -84,3 +84,17 @@ class BlockDetail(APIView):
     def get(self, request, pk, format=None):
         serializer = BlockSerializer(self.get_object(pk))
         return Response(serializer.data)
+
+
+class BlockListByDate(APIView):
+    def get(self, request, format=None):
+        now = datetime.datetime.now().date()
+        result = []
+        for i in range(2):
+            dt0 = now + datetime.timedelta(days=i)
+            dt1 = dt0 + datetime.timedelta(days=i+1)
+            blocks = Block.objects.filter(place__time_in__gte=dt0).filter(place__time_in__lt=dt1)
+            serializer = BlockSerializer(blocks, many=True)
+            print(dt0)
+            result.append({"date": dt0.isoformat(), "blocks": serializer.data})
+        return Response(result)

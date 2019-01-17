@@ -1,0 +1,17 @@
+td, th {
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  padding: 15px;
+}
+
+table {
+    text-align:center;
+    width: 100%;
+}
+
+.td_time {
+width: 30%;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
