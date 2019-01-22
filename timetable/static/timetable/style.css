@@ -11,7 +11,7 @@ table {
 }
 
 .td_time {
-width: 30%;
+width: 20%;
 }
 
 tr:nth-child(even) {background-color: #f2f2f2;}

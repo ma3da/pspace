@@ -1,19 +1,17 @@
 import datetime
 
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponseServerError
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Block, Activity, Place
 from .forms import BlockForm
-from .serializers import ActivitySerializer, BlockSerializer
+from .models import Block
+from .serializers import BlockSerializer
 
 
 class IndexView(generic.ListView):
@@ -22,7 +20,7 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return Block.objects.all().order_by("place__time_in", "place__time_out")
+        return Block.objects.all().order_by("time_start", "time_end")
 
 
 def new(request):
@@ -30,25 +28,12 @@ def new(request):
         form = BlockForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            tomorrow = timezone.now() + datetime.timedelta(days=1)
-
-            dt_in = tomorrow.replace(hour=int(data['hour_in']),
-                                     minute=0, second=0, microsecond=0)
-
-            if data['hour_out']:
-                dt_out = tomorrow.replace(hour=int(data['hour_out']),
-                                          minute=0, second=0, microsecond=0)
-            else:
-                dt_out = dt_in + datetime.timedelta(hours=1)
-
-            activity = Activity(name=data['activity_name'])
-            place = Place(time_in=dt_in, time_out=dt_out)
-
-            activity.save()
-            place.save()
-
-            block = Block(activity=activity, place=place)
-            block.save()
+            text = data["text"]
+            try:
+                block = Block.create_from_text(text)
+                block.save()
+            except Exception as e:
+                return HttpResponseServerError(content=f"an error occured: {e}")
 
             return HttpResponseRedirect(reverse("timetable:index"))
     form = BlockForm()
@@ -62,8 +47,8 @@ def delete(request, block_id):
 
 class BlockList(APIView):
     def get(self, request, format=None):
-        activities = Block.objects.all()
-        serializer = BlockSerializer(activities, many=True)
+        blocks = Block.objects.all()
+        serializer = BlockSerializer(blocks, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -88,13 +73,13 @@ class BlockDetail(APIView):
 
 class BlockListByDate(APIView):
     def get(self, request, format=None):
+        n_weekdays = 7
         now = datetime.datetime.now().date()
         result = []
-        for i in range(2):
+        for i in range(n_weekdays):
             dt0 = now + datetime.timedelta(days=i)
-            dt1 = dt0 + datetime.timedelta(days=i+1)
-            blocks = Block.objects.filter(place__time_in__gte=dt0).filter(place__time_in__lt=dt1)
+            dt1 = dt0 + datetime.timedelta(days=1)
+            blocks = Block.objects.filter(time_start__gte=dt0).filter(time_start__lt=dt1)
             serializer = BlockSerializer(blocks, many=True)
-            print(dt0)
             result.append({"date": dt0.isoformat(), "blocks": serializer.data})
         return Response(result)

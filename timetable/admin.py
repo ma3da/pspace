@@ -1,8 +1,6 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Block, Activity, Place
+from .models import Block
 
 admin.site.register(Block)
-admin.site.register(Activity)
-admin.site.register(Place)

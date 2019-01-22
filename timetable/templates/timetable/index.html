@@ -11,8 +11,8 @@
         <table v-for="block in blocks">
             <th colspan="2">[[block.date ]]</th>
             <tr v-for="block in block.blocks">
-                <td class="td_time">[[ getTimeStartStr(block) ]] - [[ getTimeStopStr(block) ]]</td>
-                <td> [[ block.activity.name ]]</td>
+                <td class="td_time" style="white-space:nowrap">[[ getTimeStartStr(block) ]] - [[ getTimeStopStr(block) ]]</td>
+                <td> [[ block.activity ]]</td>
             </tr>
             </table>
         <br/>
@@ -33,10 +33,10 @@
                   .then(response => (this.blocks = response.data));
             },
             getTimeStartStr(block) {
-                return moment(block.place.time_in).format('H[h]mm')
+                return moment(block.time_start).format('H[h]mm')
             },
             getTimeStopStr(block) {
-                return moment(block.place.time_out).format('H[h]mm')
+                return moment(block.time_end).format('H[h]mm')
             }
         },
         mounted() {
