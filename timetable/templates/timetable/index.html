@@ -21,19 +21,15 @@
 
               <div class="modal-body">
                 <slot name="body">
-                    <textarea name="text" v-model="text" width="100%" rows="3" required="required"></textarea>
                 </slot>
               </div>
-
               <div class="modal-footer">
-                <slot name="footer">
-                  <button @click="addBlock">
-                    Send
-                  </button>
-                  <button class="modal-default-button" @click="close">
-                    Cancel
-                  </button>
+                <slot name="buttons">
+
                 </slot>
+                  <button class="modal-default-button" @click="close">
+            Cancel
+          </button>
               </div>
         </div>
       </div>
@@ -43,19 +39,39 @@
 
 <!-- app -->
 <div id="app" style="display:table; margin: 0 auto">
-    <button id="show-modal" @click="showModal = true">add</button>
+    <button id="show-modal" @click="showNewModal = true">new</button>
 
-    <table v-for="block in blocks">
-        <th colspan="2">[[block.date ]]</th>
-        <tr v-for="block in block.blocks">
+    <table class="main_table" v-for="block in blocks">
+        <th colspan="2" @click="showNewModal = true; newText=[[block.date ]]">[[block.date ]]</th>
+        <tr v-for="block in block.blocks" :key="block.key" @click="showModifyModal = true; idToDelete = block.id">
             <td class="td_time" style="white-space:nowrap">[[ getTimeStartStr(block) ]] - [[ getTimeStopStr(block) ]]</td>
-            <td> [[ block.activity ]]</td>
+            <td class="td_activity">
+                [[ block.activity ]]
+            </td>
         </tr>
         </table>
     <br/>
 
-  <modal v-if="showModal" @close="showModal = false">
-    <h3 slot="header">New task</h3>
+  <modal v-if="showNewModal" @close="showNewModal = false">
+      <h3 slot="header">Create task</h3>
+      <p slot="body">
+      <textarea v-model="newText"></textarea>
+      </p>
+      <span slot="buttons">
+          <button @click="addBlock">
+            Send
+          </button>
+      </span>
   </modal>
+
+  <modal v-if="showModifyModal" @close="showModifyModal = false">
+      <h3 slot="header">Update task</h3>
+      <span slot="buttons">
+          <button @click="deleteBlock">
+            Delete
+          </button>
+      </span>
+  </modal>
+
 </div>
 <script src="{% static 'timetable/blocks.js' %}"></script>

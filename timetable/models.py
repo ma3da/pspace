@@ -54,7 +54,7 @@ class Block(models.Model):
 
 
 def parse_time(line: str, now: datetime.datetime):
-    format = "%Y/%m/%d %H%M"
+    format = "%Y-%m-%d %H%M"
     time_start = datetime.datetime.strptime(line[:15], format)
     time_end = datetime.datetime.strptime(line[:11] + line[16:20], format)
     return time_start, time_end

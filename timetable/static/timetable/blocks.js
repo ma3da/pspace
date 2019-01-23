@@ -2,7 +2,8 @@ Vue.component('modal', {
     template: '#modal-template',
     data: function () {
         return {
-          text: ''
+          text: '',
+          block_id: null,
         };
     },
     methods: {
@@ -10,11 +11,6 @@ Vue.component('modal', {
             this.$emit('close');
             this.text = '';
         },
-        addBlock: function () {
-            axios.post('/tt/api/new', {'text': this.text}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => (this.getShit()));
-            this.close()
-        }
     }
 })
 
@@ -24,7 +20,10 @@ new Vue({
     data: {
         blocks: [],
         weekBlocks: [],
-        showModal: false,
+        showNewModal: false,
+        showModifyModal: false,
+        newText: '',
+        idToDelete: null,
     },
     methods: {
         getShit () {
@@ -37,6 +36,21 @@ new Vue({
         },
         getTimeStopStr(block) {
             return moment(block.time_end).format('H[h]mm')
+        },
+        addBlock: function () {
+            axios.post('/tt/api/blocks/new', {'text': this.newText}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => (this.getShit()));
+            this.newText = '';
+            this.showNewModal = false;
+        },
+        deleteBlock: function () {
+            axios.post('/tt/api/blocks/delete', {'pk': this.idToDelete}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => (this.getShit()));
+            this.idToDelete = null;
+            this.showModifyModal = false;
+        },
+        test: function () {
+            alert("a test ");
         }
     },
     mounted() {

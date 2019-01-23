@@ -5,9 +5,23 @@ td, th {
   padding: 15px;
 }
 
-table {
+.main_table {
     text-align:center;
     width: 100%;
+    border: 1px solid #aaaaaa;
+    margin-bottom: 10px;
+}
+
+.main_table th {
+    color: black;
+}
+
+.main_table tr {
+    cursor: pointer;
+}
+
+.main_table tr:hover {
+    background-color: #aaeecc;
 }
 
 .td_time {
