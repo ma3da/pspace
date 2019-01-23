@@ -19,7 +19,6 @@ class IndexView(generic.ListView):
     context_object_name = 'weekly_blocks'
 
     def get_queryset(self):
-        """Return the last five published questions."""
         return Block.objects.all().order_by("time_start", "time_end")
 
 
@@ -40,8 +39,8 @@ def new(request):
     return render(request, "timetable/new.html", {"form": form})
 
 
-def delete(request, block_id):
-    Block.objects.get(pk=block_id).delete()
+def delete(request, pk):
+    Block.objects.get(pk=pk).delete()
     return HttpResponseRedirect(reverse("timetable:index"))
 
 
@@ -83,3 +82,16 @@ class BlockListByDate(APIView):
             serializer = BlockSerializer(blocks, many=True)
             result.append({"date": dt0.isoformat(), "blocks": serializer.data})
         return Response(result)
+
+
+class BlockNew(APIView):
+    def post(self, request, format=None):
+        text = request.data["text"]
+        try:
+            print("text:", request.data)
+            block = Block.create_from_text(text)
+            block.save()
+            print("saved blooooock")
+            return Response()
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
