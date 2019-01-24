@@ -42,7 +42,7 @@
     <button id="show-modal" @click="showNewModal = true">new</button>
 
     <table class="main_table" v-for="block in blocks">
-        <th colspan="2" @click="showNewModal = true; newText=[[block.date ]]">[[block.date ]]</th>
+        <th colspan="2" @click="showNewModal = true; newText=`${block.date} `">[[ block.date ]]</th>
         <tr v-for="block in block.blocks" :key="block.key" @click="showModifyModal = true; idToDelete = block.id">
             <td class="td_time" style="white-space:nowrap">[[ getTimeStartStr(block) ]] - [[ getTimeStopStr(block) ]]</td>
             <td class="td_activity">

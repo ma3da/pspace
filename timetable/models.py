@@ -38,12 +38,9 @@ class Block(models.Model):
     def create_from_text(cls, text: str):
         now = datetime.datetime.now()
         lines = text.split("\n")
-        if not lines:
-            raise ValueError("parsing an empty text")
-        if len(lines) == 1:
-            line = lines[0]
-            return cls(activity=line, time_start=now, time_end=now)
-        else:  # >= 2 lines
+        if len(lines) < 2:
+            raise ValueError("parsing text with less than 2 lines: time + activity needed")
+        else:
             time_line = lines[0]
             activity = "\n".join(lines[1:])
             try:
@@ -53,8 +50,31 @@ class Block(models.Model):
             return cls(activity=activity, time_start=time_start, time_end=time_end)
 
 
+def clean(line: str):
+    return line.strip().replace(',', '')
+
+
+def has_time_format(s: str):
+    return len(s) == 4 and s.isnumeric() and int(s[:2]) < 24 and int(s[2:]) < 60
+
+
 def parse_time(line: str, now: datetime.datetime):
+    line = clean(line)
     format = "%Y-%m-%d %H%M"
-    time_start = datetime.datetime.strptime(line[:15], format)
-    time_end = datetime.datetime.strptime(line[:11] + line[16:20], format)
+    date_str = line[:10]
+
+    starttime_str = line[11:15] if has_time_format(line[11:15]) else None
+
+    endtime_str = line[16:20] if has_time_format(line[16:20]) else None
+
+    if starttime_str:
+        if not endtime_str:
+            endtime_str = starttime_str
+    else:
+        starttime_str = "0000"
+        endtime_str = "2359"
+
+    time_end = datetime.datetime.strptime(f"{date_str} {endtime_str}", format)
+    time_start = datetime.datetime.strptime(f"{date_str} {starttime_str}", format)
+
     return time_start, time_end
