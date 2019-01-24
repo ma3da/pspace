@@ -24,12 +24,14 @@ new Vue({
         showModifyModal: false,
         newText: '',
         idToDelete: null,
+        log: '',
     },
     methods: {
         getShit () {
             axios
               .get('/tt/api/blocks/week')
-              .then(response => (this.blocks = response.data));
+              .then(response => (this.blocks = response.data))
+              .catch(error => (alert("oops")));
         },
         getTimeStartStr(block) {
             return moment(block.time_start).format('H[h]mm')
@@ -39,18 +41,27 @@ new Vue({
         },
         addBlock: function () {
             axios.post('/tt/api/blocks/new', {'text': this.newText}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => (this.getShit()));
-            this.newText = '';
-            this.showNewModal = false;
+            .then(response => (this.getShit()))
+            .catch(error => this.printerr("status: " + error.response.status + "\n" + error.response.data))
+            .then(() => {
+                this.newText = '';
+                this.showNewModal = false;
+            });
         },
         deleteBlock: function () {
             axios.post('/tt/api/blocks/delete', {'pk': this.idToDelete}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => (this.getShit()));
-            this.idToDelete = null;
-            this.showModifyModal = false;
+            .then(response => (this.getShit()))
+            .catch(error => this.printerr())
+            .then(() => {
+                this.idToDelete = null;
+                this.showModifyModal = false;
+            });
         },
         test: function () {
             alert("a test ");
+        },
+        printerr: function (err_msg) {
+            alert("ça a planté...\n\n" + err_msg);
         }
     },
     mounted() {
