@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views import generic
 from rest_framework import status

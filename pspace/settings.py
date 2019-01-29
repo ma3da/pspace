@@ -124,3 +124,10 @@ STATIC_ROOT = '/home/cuicui/sources/space/static/'
 
 # Login shit
 LOGIN_REDIRECT_URL = '/index'
+
+## making api calls available only for authenticated users
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
