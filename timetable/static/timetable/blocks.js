@@ -14,6 +14,30 @@ Vue.component('modal', {
     }
 })
 
+Vue.component('daily', {
+    methods: {
+        getTimeStartStr(block) {
+            return moment(block.time_start).format('H[h]mm')
+        },
+        getTimeStopStr(block) {
+            return moment(block.time_end).format('H[h]mm')
+        },
+    },
+    props: ["block"],
+    template: `
+        <table class="main_table" >
+        <th class="th_date" @click="$emit('shownew', block.date + ' ')">{{ block.date }}</th>
+        <th class="th_dayname" @click="$emit('shownew', block.date + ' ')"> {{ block.dayName }} </th>
+        <tr v-for="block in block.blocks" :key="block.key" @click="$emit('showmodify', block.id)">
+            <td class="td_time" style="white-space:nowrap">{{ getTimeStartStr(block) }} - {{ getTimeStopStr(block) }}</td>
+            <td class="td_activity">
+                {{ block.activity }}
+            </td>
+        </tr>
+        </table>
+    `
+})
+
 new Vue({
     delimiters: ['[[', ']]'],
     el: '#app',
@@ -32,12 +56,6 @@ new Vue({
               .get('/tt/api/blocks/week')
               .then(response => (this.blocks = response.data))
               .catch(error => (alert("oops")));
-        },
-        getTimeStartStr(block) {
-            return moment(block.time_start).format('H[h]mm')
-        },
-        getTimeStopStr(block) {
-            return moment(block.time_end).format('H[h]mm')
         },
         addBlock: function () {
             axios.post('/tt/api/blocks/new', {'text': this.newText}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})

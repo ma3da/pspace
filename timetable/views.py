@@ -61,7 +61,7 @@ class BlockListByDate(APIView):
                                              map(lambda id_items: id_items[1] + [('key', id_items[0])],
                                                  enumerate(map(list, map(dict.items, block_json_list))))))
 
-            result.append({"date": dt0.isoformat(), "blocks": block_json_w_key_list})
+            result.append({"date": dt0.isoformat(), "dayName": dt0.strftime("%A"), "blocks": block_json_w_key_list})
         return Response(result)
 
 

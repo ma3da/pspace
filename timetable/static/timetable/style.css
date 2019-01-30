@@ -1,3 +1,7 @@
+html {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
 td, th {
   text-align: center;
   vertical-align: middle;
@@ -8,24 +12,30 @@ td, th {
 .main_table {
     text-align:center;
     width: 100%;
-    border: 1px solid #aaaaaa;
     margin-bottom: 10px;
-}
-
-.main_table th {
-    color: black;
-}
-
-.main_table tr {
+    background: #f2f2f2;
     cursor: pointer;
 }
+
 
 .main_table tr:hover {
     background-color: #aaeecc;
 }
 
+.th_dayname {
+    color: #9c9c9c;
+    text-align: right;
+    font-weight: normal;
+}
+
+.th_date {
+width: 20%;
+text-align: left;
+}
+
 .td_time {
 width: 20%;
+text-align: left;
 }
 
 tr:nth-child(even) {background-color: #f2f2f2;}
