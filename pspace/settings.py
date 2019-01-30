@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from .nocommit import hiddensettings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +21,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '&ze^744l_3(f5+1yo!w9%(c+sf(-v9p4e)iuxs^z7p7px46&np'
+SECRET_KEY = hiddensettings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = hiddensettings.DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = hiddensettings.ALLOWED_HOSTS
 
 
 # Application definition
@@ -120,12 +121,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/cuicui/sources/space/static/'
+STATIC_ROOT = hiddensettings.STATIC_ROOT
 
 # Login shit
-LOGIN_REDIRECT_URL = '/index'
+LOGIN_REDIRECT_URL = 'index'
 
-## making api calls available only for authenticated users
+# making api calls available only for authenticated users
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
