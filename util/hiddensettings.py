@@ -1,0 +1,4 @@
+DEBUG = False
+SECRET_KEY = ""
+STATIC_ROOT = ""
+ALLOWED_HOSTS = []
