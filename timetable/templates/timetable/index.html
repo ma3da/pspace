@@ -3,76 +3,78 @@
 <html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>
-<script src="https://momentjs.com/downloads/moment.min.js"></script>
-<script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script>
 
-<link rel="stylesheet" type="text/css" href="{% static 'timetable/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+</head>
 
 <script type="text/x-template" id="modal-template">
-  <transition name="modal">
-    <div class="modal-mask" @click="close">
-      <div class="modal-wrapper">
-        <div class="modal-container" @click.stop>
+    <transition name="modal">
+        <div class="modal-mask" @click="close">
+            <div class="modal-wrapper">
+                <div class="modal-container" @click.stop>
 
-          <div class="modal-header">
-            <slot name="header">
-              default header
-            </slot>
-          </div>
+                    <div class="modal-header">
+                        <slot name="header">
+                            default header
+                        </slot>
+                    </div>
 
-              <div class="modal-body">
-                <slot name="body">
-                </slot>
-              </div>
-              <div class="modal-footer">
-                <slot name="buttons">
+                    <div class="modal-body">
+                        <slot name="body">
+                        </slot>
+                    </div>
+                    <div class="modal-footer">
+                        <slot name="buttons">
 
-                </slot>
-                  <button class="modal-default-button" @click="close">
-            Cancel
-          </button>
-              </div>
+                        </slot>
+                        <button class="modal-default-button" @click="close">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </transition>
+    </transition>
 </script>
-</head>
 
 <body>
 <!-- app -->
-<div id="app" style="display:table; margin: 0 auto">
-    <button id="show-modal" @click="showNewModal = true">new</button>
-
+<div id="app" class="centering">
+    <div class="centering">
+        <p>
+        <button id="show-modal" @click="showNewModal = true">new</button>
+        </p>
+    </div>
     <daily v-for="block in blocks"
            v-bind:block="block"
            v-on:shownew="showNewModal=true; newText=$event"
            v-on:showmodify="showModifyModal = true; idToDelete = $event">
     </daily>
-    <br/>
 
-  <modal v-if="showNewModal" @close="showNewModal = false">
-      <h3 slot="header">Create task</h3>
-      <p slot="body">
-      <textarea v-model="newText"></textarea>
-      </p>
-      <span slot="buttons">
+    <modal v-if="showNewModal" @close="showNewModal = false">
+        <h3 slot="header">Create task</h3>
+        <p slot="body">
+            <textarea v-model="newText"></textarea>
+        </p>
+        <span slot="buttons">
           <button @click="addBlock">
             Send
           </button>
       </span>
-  </modal>
+    </modal>
 
-  <modal v-if="showModifyModal" @close="showModifyModal = false">
-      <h3 slot="header">Update task</h3>
-      <span slot="buttons">
+    <modal v-if="showModifyModal" @close="showModifyModal = false">
+        <h3 slot="header">Update task</h3>
+        <span slot="buttons">
           <button @click="deleteBlock">
             Delete
           </button>
       </span>
-  </modal>
+    </modal>
 
     <p>[[log ]]</p>
 </div>

@@ -25,10 +25,12 @@ Vue.component('daily', {
     },
     props: ["block"],
     template: `
-        <table class="main_table" >
+        <table class="main_table">
+        <tr class="tr_header">
         <th class="th_date" @click="$emit('shownew', block.date + ' ')">{{ block.date }}</th>
         <th class="th_dayname" @click="$emit('shownew', block.date + ' ')"> {{ block.dayName }} </th>
-        <tr v-for="block in block.blocks" :key="block.key" @click="$emit('showmodify', block.id)">
+        </tr>
+        <tr class="tr_row" v-for="block in block.blocks" :key="block.key" @click="$emit('showmodify', block.id)">
             <td class="td_time" style="white-space:nowrap">{{ getTimeStartStr(block) }} - {{ getTimeStopStr(block) }}</td>
             <td class="td_activity">
                 {{ block.activity }}

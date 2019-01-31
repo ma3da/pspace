@@ -2,43 +2,63 @@ html {
     font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
-td, th {
-  text-align: center;
-  vertical-align: middle;
-  width: 100%;
-  padding: 15px;
+.centering {
+    display:table;
+    margin: 0 auto;
 }
 
 .main_table {
     text-align:center;
     width: 100%;
     margin-bottom: 10px;
-    background: #f2f2f2;
     cursor: pointer;
+    border-collapse: collapse;
+}
+
+.main_table td, .main_table th {
+  text-align: center;
+  vertical-align: middle;
+  padding: 15px;
 }
 
 
-.main_table tr:hover {
-    background-color: #aaeecc;
-}
-
-.th_dayname {
-    color: #9c9c9c;
+.main_table .th_dayname {
+    color: #a0a0a0;
     text-align: right;
     font-weight: normal;
 }
 
-.th_date {
-width: 20%;
-text-align: left;
+.main_table .th_date {
+    color: #ffffff;
+    font-weight: normal;
+    width: 20%;
+    text-align: left;
 }
 
-.td_time {
-width: 20%;
-text-align: left;
+.main_table .td_time {
+    width: 20%;
+    text-align: left;
 }
 
-tr:nth-child(even) {background-color: #f2f2f2;}
+.main_table .tr_row:nth-child(even) {background-color: #e7e7e7;}
+
+.main_table .tr_header {
+    background: #505050;
+}
+
+.main_table .tr_header:hover, .main_table .tr_row:hover {
+    background-color: #aaeecc;
+}
+
+.loginform td {
+  vertical-align: middle;
+  width: 100%;
+  padding: 10px;
+}
+
+.loginform .td_submit {
+    text-align: right;
+}
 
 .modal-mask {
   position: fixed;

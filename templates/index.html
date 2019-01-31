@@ -1,13 +1,18 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pspace</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
+
 <body>
-<li>
-    <ul><a href="{% url 'timetable:index' %}">agenda</a></ul>
-    <ul><a href="{% url 'logout' %}">logout</a></ul>
-</li>
+<div class="centering">
+    <li>
+        <ul><a href="{% url 'timetable:index' %}">agenda</a></ul>
+        <ul><a href="{% url 'logout' %}">logout</a></ul>
+    </li>
+</div>
 </body>
 </html>
