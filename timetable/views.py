@@ -1,4 +1,5 @@
 import datetime
+import operator
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -10,6 +11,7 @@ from rest_framework.views import APIView
 from .models import Block
 from .serializers import BlockSerializer
 
+N_WEEKDAYS = 7
 
 class IndexView(generic.ListView):
     template_name = 'timetable/index.html'
@@ -45,23 +47,56 @@ class BlockDetail(APIView):
         return Response(serializer.data)
 
 
-class BlockListByDate(APIView):
+def add_key(value_dict):
+    value, d = value_dict
+    d['key'] = value
+    return d
+
+
+class WeekBlocks(APIView):
     def get(self, request, format=None):
-        n_weekdays = 7
         now = datetime.datetime.now().date()
         result = []
-        for i in range(n_weekdays):
+        for i in range(N_WEEKDAYS):
             dt0 = now + datetime.timedelta(days=i)
             dt1 = dt0 + datetime.timedelta(days=1)
-            blocks = Block.objects.filter(time_start__gte=dt0).filter(time_start__lt=dt1).order_by('time_start')
-            serializer = BlockSerializer(blocks, many=True)
 
+            blocks = Block.objects.filter(time_start__gte=dt0).filter(time_start__lt=dt1).order_by('time_start')
+
+            serializer = BlockSerializer(blocks, many=True)
             block_json_list = serializer.data
-            block_json_w_key_list = list(map(dict,
-                                             map(lambda id_items: id_items[1] + [('key', id_items[0])],
-                                                 enumerate(map(list, map(dict.items, block_json_list))))))
+            block_json_w_key_list = list(map(add_key, enumerate(block_json_list)))
 
             result.append({"date": dt0.isoformat(), "dayName": dt0.strftime("%A"), "blocks": block_json_w_key_list})
+
+        return Response(result)
+
+
+class FutureBlocks(APIView):
+    def get(self, request, format=None):
+        result = []
+
+        now = datetime.datetime.now().date()
+        begin_date = now + datetime.timedelta(days=N_WEEKDAYS)
+
+        blocks = Block.objects.filter(time_start__gte=begin_date).order_by('time_start')
+
+        datetimes = blocks.values_list('time_start', flat=True)
+        unique_dates = set(map(lambda d: d.date(), datetimes))
+
+        dc = {
+            date: blocks.filter(time_start__gte=date)
+                                    .filter(time_start__lt=date + datetime.timedelta(days=1))
+            for date in unique_dates
+        }
+
+        for date, blocks in sorted(dc.items(), key=operator.itemgetter(0)):
+            serializer = BlockSerializer(blocks, many=True)
+            block_json_list = serializer.data
+            block_json_w_key_list = list(map(add_key, enumerate(block_json_list)))
+
+            result.append({"date": date.isoformat(), "dayName": date.strftime("%A"), "blocks": block_json_w_key_list})
+
         return Response(result)
 
 

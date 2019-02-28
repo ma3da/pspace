@@ -49,7 +49,16 @@
         <button id="show-modal" @click="showNewModal = true">new</button>
         </p>
     </div>
-    <daily v-for="block in blocks"
+    <daily class="week" v-for="block in weekBlocks"
+           v-bind:block="block"
+           v-on:shownew="showNewModal=true; newText=$event"
+           v-on:showmodify="showModifyModal = true; idToDelete = $event">
+    </daily>
+        <p align="center">.</p>
+        <p align="center">.</p>
+        <p align="center">.</p>
+
+    <daily class="future" v-for="block in futureBlocks"
            v-bind:block="block"
            v-on:shownew="showNewModal=true; newText=$event"
            v-on:showmodify="showModifyModal = true; idToDelete = $event">
@@ -75,8 +84,6 @@
           </button>
       </span>
     </modal>
-
-    <p>[[log ]]</p>
 </div>
 
 <script src="{% static 'timetable/blocks.js' %}"></script>

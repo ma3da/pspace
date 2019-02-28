@@ -12,7 +12,8 @@ urlpatterns = [
     path('api/blocks/delete', views.BlockDelete.as_view(), name='delete'),
     path('api/blocks', views.BlockList.as_view(), name='blocks'),
     path('api/blocks/<int:pk>', views.BlockDetail.as_view(), name='blocks_detail'),
-    path('api/blocks/week', views.BlockListByDate.as_view(), name='blocks_date'),
+    path('api/blocks/week', views.WeekBlocks.as_view(), name='blocks_week'),
+    path('api/blocks/future', views.FutureBlocks.as_view(), name='blocks_future'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

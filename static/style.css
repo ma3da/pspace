@@ -23,7 +23,7 @@ html {
 
 
 .main_table .th_dayname {
-    color: #a0a0a0;
+    color: #b0b0b0;
     text-align: right;
     font-weight: normal;
 }
@@ -42,6 +42,7 @@ html {
 
 .main_table .tr_row:nth-child(even) {background-color: #e7e7e7;}
 
+
 .main_table .tr_header {
     background: #505050;
 }
@@ -49,6 +50,21 @@ html {
 .main_table .tr_header:hover, .main_table .tr_row:hover {
     background-color: #aaeecc;
 }
+
+.main_table.future .tr_header {
+    background: #b0b0b0;
+}
+
+.main_table.future .th_dayname {
+    color: #f0f0f0;
+}
+
+.main_table.future .tr_row:nth-child(even) {background-color: #efefef;}
+
+.future {
+    color: #b0b0b0;
+}
+
 
 .loginform td {
   vertical-align: middle;

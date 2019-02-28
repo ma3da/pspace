@@ -44,8 +44,8 @@ new Vue({
     delimiters: ['[[', ']]'],
     el: '#app',
     data: {
-        blocks: [],
         weekBlocks: [],
+        futureBlocks: [],
         showNewModal: false,
         showModifyModal: false,
         newText: '',
@@ -53,11 +53,21 @@ new Vue({
         log: '',
     },
     methods: {
-        getShit () {
+        getWeekBlocks: function () {
             axios
               .get('/tt/api/blocks/week')
-              .then(response => (this.blocks = response.data))
-              .catch(error => (alert("oops")));
+              .then(response => (this.weekBlocks = response.data))
+              .catch(error => (alert("getting week blocks failed")));
+        },
+        getFutureBlocks: function () {
+            axios
+              .get('/tt/api/blocks/future')
+              .then(response => (this.futureBlocks = response.data))
+              .catch(error => (alert("getting future blocks failed")));
+        },
+        getShit () {
+            this.getWeekBlocks();
+            this.getFutureBlocks();
         },
         addBlock: function () {
             axios.post('/tt/api/blocks/new', {'text': this.newText}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
