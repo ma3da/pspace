@@ -8,11 +8,13 @@
 </head>
 
 <body>
-<div class="centering">
-    <li>
-        <ul><a href="{% url 'timetable:index' %}">agenda</a></ul>
-        <ul><a href="{% url 'logout' %}">logout</a></ul>
-    </li>
+<div class="vh-centering-container">
+    <div class="vh-centering">
+        <a class="button" href="{% url 'timetable:index' %}">agenda</a>
+        <br>
+        <br>
+        <a class="button" href="{% url 'logout' %}">logout</a>
+    </div>
 </div>
 </body>
 </html>

@@ -9,37 +9,37 @@
 
 <body>
 
-<div class="centering">
-    {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-    {% endif %}
+<div class="vh-centering-container">
+    <div class="vh-centering" style="color:#a0a0a0">
+        <div class="centering">
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <table class="loginform">
+                    <tr>
+                        <td>{{ form.username }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form.password }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_submit" colspan="2"><input type="submit" value="login"></td>
+                    </tr>
+                </table>
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+        </div>
+        {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+        {% endif %}
 
-    {% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-        please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
-    {% endif %}
-    {% endif %}
-    <div class="centering">
-    <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <table class="loginform">
-            <tr>
-                <td class="td_label">{{ form.username.label_tag }}</td>
-                <td>{{ form.username }}</td>
-            </tr>
-            <tr>
-                <td class="td_label">{{ form.password.label_tag }}</td>
-                <td>{{ form.password }}</td>
-            </tr>
-            <tr>
-                <td class="td_submit" colspan="2"><input type="submit" value="login"></td>
-            </tr>
-        </table>
-        <input type="hidden" name="next" value="{{ next }}">
-    </form>
+        {% if next %}
+        {% if user.is_authenticated %}
+        <p>Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.</p>
+        {% else %}
+        <p>Please login to see this page.</p>
+        {% endif %}
+        {% endif %}
     </div>
 </div>
 

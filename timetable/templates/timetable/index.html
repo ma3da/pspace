@@ -46,7 +46,8 @@
 <div id="app" class="centering">
     <div class="centering">
         <p>
-        <button @click="showNewModal = true">new</button>
+        <a href="#" class="button" @click="showNewModal = true">new</a>
+        <a href="{% url 'index' %}" class="button">menu</a>
         </p>
     </div>
     <daily class="week" v-for="block in weekBlocks"
