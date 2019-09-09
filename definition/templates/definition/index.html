@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <title>definition</title>
+    <script>
+        function goForDef() {
+          window.location.href = "https://www.cnrtl.fr/definition/" + document.getElementById("word").value
+        }
+    </script>
+</head>
+<body>
+<div class="vh-centering-container">
+    <div class="vh-centering" style="color:#a0a0a0">
+        <div class="centering">
+            <input type="text" id="word">
+            <button onclick="goForDef()">go</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

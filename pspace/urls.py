@@ -25,5 +25,6 @@ urlpatterns = [
     path('accounts/login/', LoginView.as_view(authentication_form=CustomAuthForm), name='login'),
     path('logout', views.logout_view, name='logout'),
     path('tt/', include('timetable.urls')),
+    path('def/', include('definition.urls')),
     path('admin/', admin.site.urls),
 ]

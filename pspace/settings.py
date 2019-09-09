@@ -33,6 +33,7 @@ ALLOWED_HOSTS = hiddensettings.ALLOWED_HOSTS
 
 INSTALLED_APPS = [
     'timetable.apps.TimetableConfig',
+    'definition.apps.DefinitionConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
