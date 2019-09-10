@@ -20,6 +20,8 @@ def get_definition_html(word):
     resp = requests.get(url)
     soup = bs4.BeautifulSoup(resp.content, "html.parser")
     arts = [div for div in soup("div") if "id" in div.attrs and div["id"].startswith("art")]
+    if not arts:
+        return "Nope"
     return str(arts[0])
 
 
