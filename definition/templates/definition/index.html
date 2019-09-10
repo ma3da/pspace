@@ -13,7 +13,7 @@
 
 <body>
 <div id="app" class="vh-centering-container">
-    <div class="vh-centering" style="color:#a0a0a0">
+    <div class="vh-centering" style="color:#212121">
         <div class="centering">
             <form action="#">
                 <input type="text" v-model="word" />
@@ -21,7 +21,7 @@
             </form>
         </div>
         <div>
-            [[ definitionHtml ]]
+            <span v-html="definitionHtml"></span>
         </div>
     </div>
 </div>
@@ -38,10 +38,12 @@
         },
         methods: {
             loadDef: function () {
+                if (this.word != '') {
                 axios
                   .get('/def/api/def/' + this.word)
                   .then(response => (this.definitionHtml = response.data.htmlcontent))
                   .catch(error => this.printerr(error));
+                }
             },
             test: function () {
                 alert("a test ");
