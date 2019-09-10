@@ -6,20 +6,52 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
     <title>definition</title>
-    <script>
-        function goForDef() {
-          window.location.href = "https://www.cnrtl.fr/definition/" + document.getElementById("word").value
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>
+
 </head>
+
 <body>
-<div class="vh-centering-container">
+<div id="app" class="vh-centering-container">
     <div class="vh-centering" style="color:#a0a0a0">
         <div class="centering">
-            <input type="text" id="word">
-            <button onclick="goForDef()">go</button>
+            <form action="#">
+                <input type="text" v-model="word" />
+                <input type="submit" value="go" @click="loadDef" />
+            </form>
+        </div>
+        <div>
+            [[ definitionHtml ]]
         </div>
     </div>
 </div>
 </body>
+
+<script>
+    new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            definitionHtml: '',
+            word: '',
+            value: 'heho',
+        },
+        methods: {
+            loadDef: function () {
+                axios
+                  .get('/def/api/def/' + this.word)
+                  .then(response => (this.definitionHtml = response.data.htmlcontent))
+                  .catch(error => this.printerr(error));
+            },
+            test: function () {
+                alert("a test ");
+            },
+            printerr: function (err_msg) {
+                alert("ça a planté...\n\n" + err_msg);
+            }
+        },
+        mounted() {
+        }
+    })
+</script>
 </html>

@@ -7,7 +7,8 @@ from . import views
 app_name = 'definition'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', login_required(views.index), name='index'),
+    path('api/def/<str:word>', views.DefinitionView.as_view(), name='defget'),
 ]
 
-# urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns)
