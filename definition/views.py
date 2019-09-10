@@ -15,6 +15,10 @@ def check_input(word):
     return True
 
 
+def format_article(art):
+    return "</br>".join([str(div) for div in art])
+
+
 def get_definition_html(word):
     url = f"https://www.cnrtl.fr/definition/{word}"
     resp = requests.get(url)
@@ -22,7 +26,7 @@ def get_definition_html(word):
     arts = [div for div in soup("div") if "id" in div.attrs and div["id"].startswith("art")]
     if not arts:
         return "Nope"
-    return str(arts[0])
+    return format_article(arts[0])
 
 
 class DefinitionView(APIView):
