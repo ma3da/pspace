@@ -194,3 +194,18 @@ input[type=text], input[type=password] {
 .vh-centering {
   margin: auto;
 }
+
+.searchbar {
+  overflow: hidden;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100vw;
+  background-color: white;
+}
+
+.definition-content {
+    overflow:auto;
+    width:96vw;
+    padding-bottom:50vh;
+}
