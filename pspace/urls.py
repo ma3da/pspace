@@ -26,5 +26,6 @@ urlpatterns = [
     path('logout', views.logout_view, name='logout'),
     path('tt/', include('timetable.urls')),
     path('def/', include('definition.urls')),
+    path('lbcflba/', include('lbcflba.urls')),
     path('admin/', admin.site.urls),
 ]
