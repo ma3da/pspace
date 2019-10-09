@@ -1,6 +1,6 @@
 db.sqlite3
-**/__pycache__
-**/nocommit
+**__pycache__
+**nocommit
 
 venv
 .idea

@@ -29,9 +29,12 @@ DEBUG = hiddensettings.DEBUG
 ALLOWED_HOSTS = hiddensettings.ALLOWED_HOSTS
 
 
+AUTH_USER_MODEL = 'pspace.User'
+
 # Application definition
 
 INSTALLED_APPS = [
+    'pspace',
     'timetable.apps.TimetableConfig',
     'definition.apps.DefinitionConfig',
     'lbcflba.apps.LbcflbaConfig',
