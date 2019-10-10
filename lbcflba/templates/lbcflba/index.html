@@ -43,9 +43,6 @@
 </script>
 
 <body>
-{% for user in users %}
-{{ user.username }}: {{ user.id }} <br>
-{% endfor %}
 <div id="app">
     <div class="centering">
         <p>
@@ -54,14 +51,20 @@
         </p>
     </div>
 
-
+    <div class="centering">
     <daily v-for="transaction in transactions" v-bind:transaction="transaction"></daily>
-
+    </div>
 
     <modal v-if="showNewModal" @close="showNewModal = false">
         <h3 slot="header">new transaction</h3>
         <p slot="body">
-            <textarea v-model="newText"></textarea>
+            <select v-model="destination" id="">
+                {% for user in users %}
+                <option value={{ user.id }}>{{ user.username }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" v-model="amount" step=".01">
+            <textarea v-model="text"></textarea>
         </p>
         <span slot="buttons">
           <button @click="newTransaction">

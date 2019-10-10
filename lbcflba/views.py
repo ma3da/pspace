@@ -37,10 +37,11 @@ class TransactionList(APIView):
 class TransactionNew(APIView):
     def post(self, request, format=None):
         try:
-            text = request.data["text"]
-            amount = request.data["amount"]
             src_id = request.user.id
-            dest_id = request.data["dest"]
+            dest_id = request.data["destination"]
+            amount = request.data["amount"]
+            text = request.data["text"]
+
             transaction = Transaction(source=get_user_model().objects.get(id=src_id),
                                       destination=get_user_model().objects.get(id=dest_id),
                                       amount=amount, text=text, time=datetime.datetime.now(), status=0)

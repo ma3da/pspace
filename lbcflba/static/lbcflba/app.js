@@ -16,13 +16,13 @@ Vue.component('modal', {
 
 Vue.component('daily', {
     methods: {
-        getTimeStr(block) {
-            return moment(block.time_start).format('H[h]mm')
+        getTimeStr(transaction) {
+            return moment(transaction.time).format('DD MMM[,] H[h]mm')
         },
     },
     props: ["transaction"],
     template: `
-    <table>
+    <table class="main_table">
         <tr>
             <td> {{ transaction.source }} -> {{ transaction.destination }} </td>
             <td> {{ transaction.amount }} </td>
@@ -41,8 +41,8 @@ new Vue({
     el: '#app',
     data: {
         transactions: [],
-        newText: '',
-        dest: 1,
+        text: '',
+        destination: 1,
         amount: 0,
         showNewModal: false,
     },
@@ -55,12 +55,12 @@ new Vue({
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
-                       {'dest': this.dest, 'text': this.newText, 'amount': this.amount},
+                       {'destination': this.destination, 'text': this.text, 'amount': this.amount},
                        {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => (this.getAll()))
             .catch(error => this.printerr("status: " + error.response.status + "\n" + error.response.data))
             .then(() => {
-                this.newText = '';
+                this.text = '';
                 this.showNewModal = false;
             });
         },
