@@ -3,6 +3,8 @@ from django.urls import path
 
 from . import views, app_name
 
+app_name = app_name  # registering namespace ?
+
 urlpatterns = [
-    path('', login_required(views.IndexView.as_view()), name=app_name + '_index'),
+    path('', login_required(views.IndexView.as_view()), name='index'),
 ]

@@ -14,8 +14,16 @@
 
 <body>
 
-{{ transactions }}
+<div id="app">
+    <div class="centering">
+        <p>
+        <a href="#" class="button" @click="showNewModal = true">new</a>
+        <a href="{% url 'index' %}" class="button">menu</a>
+        </p>
+    </div>
+</div>
 
-<!--<script src="{% static 'lbcflba/app.js' %}"></script>-->
+<script src="{% static 'lbcflba/app.js' %}"></script>
+
 </body>
 </html>
