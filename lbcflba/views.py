@@ -1,6 +1,12 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.views import generic
+
+from . import app_name
+from .models import Transaction
 
 
-def index(request):
-    return HttpResponse("lbcflba")
+class IndexView(generic.ListView):
+    template_name = f"{app_name}/index.html"
+    context_object_name = 'transactions'
+
+    def get_queryset(self):
+        return app_name
