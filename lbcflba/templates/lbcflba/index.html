@@ -4,16 +4,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <head>
     <title>lbcflba</title>
-<!--    <script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
-<!--    <script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>-->
-<!--    <script src="https://momentjs.com/downloads/moment.min.js"></script>-->
-<!--    <script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>
+    <script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
 
-<body>
+<script type="text/x-template" id="modal-template">
+    <transition name="modal">
+        <div class="modal-mask" @click="close">
+            <div class="modal-wrapper">
+                <div class="modal-container" @click.stop>
 
+                    <div class="modal-header">
+                        <slot name="header">
+                            default header
+                        </slot>
+                    </div>
+
+                    <div class="modal-body">
+                        <slot name="body">
+                        </slot>
+                    </div>
+                    <div class="modal-footer">
+                        <slot name="buttons">
+
+                        </slot>
+                        <button class="modal-default-button" @click="close">
+                            cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
+</script>
+
+<body>
+{% for user in users %}
+{{ user.username }}: {{ user.id }} <br>
+{% endfor %}
 <div id="app">
     <div class="centering">
         <p>
@@ -21,6 +53,22 @@
         <a href="{% url 'index' %}" class="button">menu</a>
         </p>
     </div>
+
+
+    <daily v-for="transaction in transactions" v-bind:transaction="transaction"></daily>
+
+
+    <modal v-if="showNewModal" @close="showNewModal = false">
+        <h3 slot="header">new transaction</h3>
+        <p slot="body">
+            <textarea v-model="newText"></textarea>
+        </p>
+        <span slot="buttons">
+          <button @click="newTransaction">
+            send
+          </button>
+      </span>
+    </modal>
 </div>
 
 <script src="{% static 'lbcflba/app.js' %}"></script>
