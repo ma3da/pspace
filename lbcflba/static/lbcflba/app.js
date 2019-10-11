@@ -42,6 +42,7 @@ new Vue({
     el: '#app',
     data: {
         transactions: [],
+        contacts: [],
         text: '',
         destination: 1,
         amount: 0,
@@ -55,7 +56,11 @@ new Vue({
             axios
               .get('/lbcflba/api/all')
               .then(response => (this.transactions = response.data))
-              .catch(error => printerr("getAll"));
+              .catch(error => printerr("getAll::transactions"));
+            axios
+              .get('/lbcflba/api/contacts/all')
+              .then(response => (this.contacts = response.data))
+              .catch(error => printerr("getAll::contacts"));
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',

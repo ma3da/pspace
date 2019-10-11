@@ -22,16 +22,12 @@ class IndexView(generic.ListView):
 
 class TransactionList(APIView):
     def get(self, request, format=None):
-        blocks = Transaction.objects.all()
-        serializer = TransactionSerializer(blocks, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        serializer = TransactionSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+        try:
+            transactions = Transaction.objects.all()
+            serializer = TransactionSerializer(transactions, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class TransactionNew(APIView):
@@ -41,7 +37,7 @@ class TransactionNew(APIView):
             dest_id = request.data["destination"]
             amount = request.data["amount"]
             text = request.data["text"]
-
+            print(request.data)
             transaction = Transaction(source=get_user_model().objects.get(id=src_id),
                                       destination=get_user_model().objects.get(id=dest_id),
                                       amount=amount, text=text, time=datetime.datetime.now(), status=0)
@@ -58,5 +54,14 @@ class TransactionDelete(APIView):
 
             Transaction.objects.get(pk=pk).delete()
             return Response()
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ContactList(APIView):
+    def get(self, request, format=None):
+        try:
+            users = get_user_model().objects.exclude(id=request.user.id)
+            return Response([{"id": user.id, "username": user.username} for user in users])
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

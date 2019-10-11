@@ -64,9 +64,7 @@
                 <option value=-1>to</option>
             </select>
             <select v-model="destination">
-                {% for user in users %}
-                <option value={{ user.id }}>{{ user.username }}</option>
-                {% endfor %}
+                <option v-for="user in contacts" :value="user.id">[[ user.username ]]</option>
             </select>
             <br>
             <input type="number" v-model="amount" step=".01">
