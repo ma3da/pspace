@@ -52,11 +52,13 @@
     </div>
 
     <div class="centering">
-    <daily v-for="transaction in transactions"
+        <recap :transactions="transactions" :users="users"></recap>
+        <br>
+        <daily v-for="transaction in transactions"
            :transaction="transaction"
            :users="users"
-           @showModify="showModifyModal = true; pk = $event"></daily>
-<!--           :style="getAmountColor(transaction)"-->
+           @showModify="showModifyModal = true; pk = $event">
+        </daily>
     </div>
 
     <modal v-if="showNewModal" @close="showNewModal = false">
