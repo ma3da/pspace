@@ -31,7 +31,7 @@ Vue.component('daily', {
         <tr>
             <td> {{ transaction.text }} </td>
             <td> </td>
-            <td> {{ transaction.status }} </td>
+            <td @click="$emit('showmodify', transaction.id)"> {{ transaction.status }} </td>
         </tr>
         </table>
     `
@@ -46,7 +46,9 @@ new Vue({
         destination: 1,
         amount: 0,
         showNewModal: false,
+        showModifyModal: false,
         fromto: 1,
+        pk: null,
     },
     methods: {
         getAll: function () {
@@ -66,15 +68,15 @@ new Vue({
                 this.showNewModal = false;
             });
         },
-//        deleteBlock: function () {
-//            axios.post('/tt/api/blocks/delete', {'pk': this.idToDelete}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-//            .then(response => (this.getShit()))
-//            .catch(error => this.printerr())
-//            .then(() => {
-//                this.idToDelete = null;
-//                this.showModifyModal = false;
-//            });
-//        },
+        deleteTransaction: function () {
+            axios.post('/lbcflba/api/delete', {'pk': this.pk}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => (this.getAll()))
+            .catch(error => this.printerr("status: " + error.response.status + "\n" + error.response.data))
+            .then(() => {
+                this.pk = null;
+                this.showModifyModal = false;
+            });
+        },
         test: function () {
             alert("testing testing");
         },

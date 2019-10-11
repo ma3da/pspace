@@ -49,3 +49,14 @@ class TransactionNew(APIView):
             return Response()
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class TransactionDelete(APIView):
+    def post(self, request, format=None):
+        try:
+            pk = request.data["pk"]
+
+            Transaction.objects.get(pk=pk).delete()
+            return Response()
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

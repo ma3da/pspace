@@ -52,7 +52,8 @@
     </div>
 
     <div class="centering">
-    <daily v-for="transaction in transactions" v-bind:transaction="transaction"></daily>
+    <daily v-for="transaction in transactions" v-bind:transaction="transaction"
+    v-on:showModify="showModifyModal = true; pk = $event"></daily>
     </div>
 
     <modal v-if="showNewModal" @close="showNewModal = false">
@@ -75,6 +76,15 @@
         <span slot="buttons">
           <button @click="newTransaction">
             send
+          </button>
+      </span>
+
+    </modal>
+        <modal v-if="showModifyModal" @close="showModifyModal = false">
+        <h3 slot="header">Update task</h3>
+        <span slot="buttons">
+          <button @click="deleteTransaction">
+            delete
           </button>
       </span>
     </modal>
