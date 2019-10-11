@@ -33,11 +33,17 @@ class TransactionList(APIView):
 class TransactionNew(APIView):
     def post(self, request, format=None):
         try:
-            src_id = request.user.id
-            dest_id = request.data["destination"]
+            other_id = request.data["other"]
+            direction = request.data["direction"]
+            if direction == "from_user":
+                src_id, dest_id = request.user.id, other_id
+            elif direction == "to_user":
+                src_id, dest_id = other_id, request.user.id
+            else:
+                raise ValueError(f"Direction should be either 'from_user' or 'to_user', not: {direction}")
             amount = request.data["amount"]
             text = request.data["text"]
-            print(request.data)
+
             transaction = Transaction(source=get_user_model().objects.get(id=src_id),
                                       destination=get_user_model().objects.get(id=dest_id),
                                       amount=amount, text=text, time=datetime.datetime.now(), status=0)
@@ -58,10 +64,16 @@ class TransactionDelete(APIView):
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+def _user2json(user):
+    return {"id": user.id, "username": user.username}
+
+
 class ContactList(APIView):
     def get(self, request, format=None):
         try:
+            main_user = get_user_model().objects.get(id=request.user.id)
             users = get_user_model().objects.exclude(id=request.user.id)
-            return Response([{"id": user.id, "username": user.username} for user in users])
+            return Response({"me": _user2json(main_user),
+                             "contacts": [_user2json(user) for user in users]})
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -52,19 +52,22 @@
     </div>
 
     <div class="centering">
-    <daily v-for="transaction in transactions" v-bind:transaction="transaction"
-    v-on:showModify="showModifyModal = true; pk = $event"></daily>
+    <daily v-for="transaction in transactions"
+           :transaction="transaction"
+           :users="users"
+           @showModify="showModifyModal = true; pk = $event"></daily>
+<!--           :style="getAmountColor(transaction)"-->
     </div>
 
     <modal v-if="showNewModal" @close="showNewModal = false">
         <h3 slot="header">new transaction</h3>
         <p slot="body">
-            <select v-model="fromto">
-                <option value=1>from</option>
-                <option value=-1>to</option>
+            <select v-model="direction">
+                <option value="to_user">from</option>
+                <option value="from_user">to</option>
             </select>
-            <select v-model="destination">
-                <option v-for="user in contacts" :value="user.id">[[ user.username ]]</option>
+            <select v-model="other">
+                <option v-for="user in users.contacts" :value="user.id">[[ user.username ]]</option>
             </select>
             <br>
             <input type="number" v-model="amount" step=".01">
