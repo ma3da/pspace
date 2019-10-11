@@ -24,12 +24,13 @@ Vue.component('daily', {
     template: `
     <table class="main_table">
         <tr>
+            <td rowspan="2"> {{ transaction.amount }} </td>
             <td> {{ transaction.source }} -> {{ transaction.destination }} </td>
-            <td> {{ transaction.amount }} </td>
-            <td> {{ getTimeStr(transaction) }} </td>
+            <td colspan="2"> {{ getTimeStr(transaction) }} </td>
         </tr>
         <tr>
-            <td colspan="2"> {{ transaction.text }} </td>
+            <td> {{ transaction.text }} </td>
+            <td> </td>
             <td> {{ transaction.status }} </td>
         </tr>
         </table>
@@ -45,6 +46,7 @@ new Vue({
         destination: 1,
         amount: 0,
         showNewModal: false,
+        fromto: 1,
     },
     methods: {
         getAll: function () {
@@ -55,7 +57,7 @@ new Vue({
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
-                       {'destination': this.destination, 'text': this.text, 'amount': this.amount},
+                       {'destination': this.destination, 'text': this.text, 'amount': this.fromto * this.amount},
                        {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => (this.getAll()))
             .catch(error => this.printerr("status: " + error.response.status + "\n" + error.response.data))

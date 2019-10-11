@@ -58,12 +58,18 @@
     <modal v-if="showNewModal" @close="showNewModal = false">
         <h3 slot="header">new transaction</h3>
         <p slot="body">
-            <select v-model="destination" id="">
+            <select v-model="fromto">
+                <option value=1>from</option>
+                <option value=-1>to</option>
+            </select>
+            <select v-model="destination">
                 {% for user in users %}
                 <option value={{ user.id }}>{{ user.username }}</option>
                 {% endfor %}
             </select>
+            <br>
             <input type="number" v-model="amount" step=".01">
+            <br>
             <textarea v-model="text"></textarea>
         </p>
         <span slot="buttons">
