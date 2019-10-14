@@ -118,6 +118,9 @@ new Vue({
         showModifyModal: false,
         direction: 1,
         pk: null,
+        groups: [],
+        members: [],
+        selectedGroup: null,
     },
     methods: {
         getAll: function () {
@@ -129,6 +132,22 @@ new Vue({
               .get('/lbcflba/api/contacts/all')
               .then(response => (this.users = response.data))
               .catch(error => printerr("getAll::contacts"));
+            this.getGroups();
+        },
+        getGroups: function() {
+            axios
+              .get('/lbcflba/api/groups')
+              .then(response => (this.groups = response.data))
+              .catch(error => printerr("status: " + error.response.status + "\n" + error.response.data));
+        },
+        getMembers: function(groupId) {
+            axios
+              .get('/lbcflba/api/members/' + groupId)
+              .then(response => (this.members = response.data))
+              .catch(error => printerr("status: " + error.response.status + "\n" + error.response.data));
+        },
+        getMembersSelected: function() {
+            this.getMembers(this.selectedGroup);
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',

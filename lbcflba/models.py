@@ -39,8 +39,8 @@ _SEPARATOR = ";"
 
 
 def to_list(entry):
-    return entry.split(_SEPARATOR)
+    return list(map(int, entry.split(_SEPARATOR)))
 
 
-def to_entry(list):
-    return _SEPARATOR.join(list)
+def to_entry(list_):
+    return _SEPARATOR.join(map(str, list_))

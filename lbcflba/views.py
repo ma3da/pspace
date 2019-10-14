@@ -94,10 +94,11 @@ class GroupList(APIView):
 
 
 class MemberList(APIView):
-    def get(self, request, format=None):
+    def get(self, request, group_id, format=None):
         try:
-            group_id = request.data["group"]
-            members = to_list(Group.objects.get(id=group_id).members)
-            return members
+            group_member_ids = to_list(Group.objects.get(id=group_id).members)
+            users = (Spender.objects.get(id=user_id).user for user_id in group_member_ids)
+            return Response(list(map(_user2json, users)))
         except Exception as e:
+            print(e)
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
