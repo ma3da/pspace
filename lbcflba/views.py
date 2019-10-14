@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from .serializers import TransactionSerializer
 from . import app_name
-from .models import Transaction
+from .models import Transaction, to_list, Spender, Group
 
 
 class IndexView(generic.ListView):
@@ -68,12 +68,36 @@ def _user2json(user):
     return {"id": user.id, "username": user.username}
 
 
+def get_main_user(request):
+    return get_user_model().objects.get(id=request.user.id)
+
+
 class ContactList(APIView):
     def get(self, request, format=None):
         try:
-            main_user = get_user_model().objects.get(id=request.user.id)
+            main_user = get_main_user(request)
             users = get_user_model().objects.exclude(id=request.user.id)
             return Response({"me": _user2json(main_user),
                              "contacts": [_user2json(user) for user in users]})
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GroupList(APIView):
+    def get(self, request, format=None):
+        try:
+            spender = get_main_user(request).spender
+            groups = to_list(spender.groups)
+            return Response(groups)
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class MemberList(APIView):
+    def get(self, request, format=None):
+        try:
+            group_id = request.data["group"]
+            members = to_list(Group.objects.get(id=group_id).members)
+            return members
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

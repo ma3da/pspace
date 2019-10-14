@@ -24,3 +24,23 @@ class Status(enum.Enum):
         if getattr(cls, "value_mapping", None) is None:
             Status.value_mapping = {status.value: status.name for status in cls}
         return Status.value_mapping.get(n, None)
+
+
+class Spender(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    groups = models.TextField()
+
+
+class Group(models.Model):
+    members = models.TextField()
+
+
+_SEPARATOR = ";"
+
+
+def to_list(entry):
+    return entry.split(_SEPARATOR)
+
+
+def to_entry(list):
+    return _SEPARATOR.join(list)
