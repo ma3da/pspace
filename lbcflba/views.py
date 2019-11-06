@@ -12,12 +12,28 @@ from . import app_name
 from .models import Transaction, to_list, Spender, Group, to_entry
 
 
+def get_main_user(request):
+    return get_user_model().objects.get(id=request.user.id)
+
+
+def _user2json(user):
+    return {"spenderId": user.spender.id, "username": user.username}
+
+
 class IndexView(generic.ListView):
     template_name = f"{app_name}/index.html"
     context_object_name = 'users'
 
     def get_queryset(self):
-        return User.objects.all()
+        return []
+
+
+class UserInfo(APIView):
+    def get(self, request, format=None):
+        try:
+            return Response(_user2json(get_main_user(request)))
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class TransactionList(APIView):
@@ -57,14 +73,6 @@ class TransactionDelete(APIView):
             return Response()
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-def _user2json(user):
-    return {"id": user.spender.id, "username": user.username}
-
-
-def get_main_user(request):
-    return get_user_model().objects.get(id=request.user.id)
 
 
 class ContactList(APIView):

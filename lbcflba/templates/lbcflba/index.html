@@ -51,17 +51,22 @@
         </p>
     </div>
     <div class="centering">
-        [[ members ]]
+        [[ userInfo ]] <br>
+        [[ members ]] <br>
+        [[ transactions ]] <br>
         <select v-model="selectedGroupId" @change="updateSelection()">
             <option v-for="group in groups" :value="group">[[ group ]]</option>
         </select>
     </div>
     <div class="centering">
-        <recap :transactions="selectedGroupTransactions"></recap>
+        <recap :transactions="selectedGroupTransactions"
+               :userinfo="userInfo">
+        </recap>
         <br>
         <daily v-for="transaction in selectedGroupTransactions"
-           :transaction="transaction"
-           @showModify="showModifyModal = true; pk = $event">
+               :transaction="transaction"
+               :userinfo="userInfo"
+               @showModify="showModifyModal = true; pk = $event">
         </daily>
     </div>
 

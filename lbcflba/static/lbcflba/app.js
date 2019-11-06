@@ -19,17 +19,21 @@ Vue.component('daily', {
         getTimeStr(transaction) {
             return moment(transaction.time).format('DD MMM[,] H[h]mm')
         },
-        getAmountStyle(transaction) {
-            color = "Gray";
+        getAmountStyle(transaction, spenderId) {
+            if (transaction.source == spenderId) {
+                color = "Tomato";
+            } else {
+                color =  "MediumSeaGreen";
+            }
             return {color: color, background: "white", width: "10%"};
         },
     },
-    props: ["transaction"],
+    props: ["transaction", "userinfo"],
     template: `
     <table class="main_table" style="border: 2px solid #eeeeee; color: Gray; background: #eeeeee">
         <tr>
-            <td rowspan="2" v-bind:style="getAmountStyle(transaction)"> {{ transaction.amount }} </td>
-            <td style="text-align: left"> >> </td>
+            <td rowspan="2" v-bind:style="getAmountStyle(transaction, userinfo.spenderId)"> {{ transaction.amount }} </td>
+            <td style="text-align: left"> {{ userinfo.username }} </td>
             <td colspan="2" style="text-align: right"> {{ getTimeStr(transaction) }} </td>
         </tr>
         <tr>
@@ -67,7 +71,7 @@ Vue.component('recap', {
             return {color: color};
         },
     },
-    props: ["transactions"],
+    props: ["transactions", "userinfo"],
     template: `
     <table class="main_table" style="border: 1px solid #eeeeee">
         <tr>
@@ -81,13 +85,13 @@ new Vue({
     delimiters: ['[[', ']]'],
     el: '#app',
     data: {
+        userInfo: {},
         transactions: [],
         text: '',
         other: 1,
         amount: 0,
         showNewModal: false,
         showModifyModal: false,
-        direction: 1,
         pk: null,
         groups: [],
         members: [],
@@ -99,17 +103,13 @@ new Vue({
             axios
               .get('/lbcflba/api/all')
               .then(response => {this.transactions = response.data; this.getGroups(); this.updateSelection();})
-              .catch(error => printerr("getAll::transactions"));
+              .catch(this.printResponseError);
         },
         updateSelection: function () {
-            if (this.selectedGroupId != null) {
-                this.getMembers(this.selectedGroupId);
-                this.selectedGroupTransactions = [];
-                for (transaction of this.transactions) {
-                    if (transaction.destination == this.selectedGroupId) {
-                        this.selectedGroupTransactions.push(transaction);
-                    }
-                }
+            sid = this.selectedGroupId
+            if (sid != null) {
+                this.getMembers(sid);
+                this.selectedGroupTransactions = this.transactions.filter(t => (t.destination == sid))
             }
         },
         getGroups: function() {
@@ -118,14 +118,19 @@ new Vue({
               .then(response => (this.groups = response.data))
               .catch(this.printResponseError)
         },
-        getMembers: function(groupId) {
-            if (groupId == null) {
-                return [];
-            }
+        getUserInfo: function() {
             axios
-              .get('/lbcflba/api/members/' + groupId)
-              .then(response => (this.members = response.data))
-              .catch(this.printResponseError)
+                  .get('/lbcflba/api/userinfo')
+                  .then(response => (this.userInfo = response.data))
+                  .catch(this.printResponseError);
+        },
+        getMembers: function(groupId) {
+            if (groupId != null) {
+                axios
+                  .get('/lbcflba/api/members/' + groupId)
+                  .then(response => (this.members = response.data))
+                  .catch(this.printResponseError);
+            }
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
@@ -137,9 +142,6 @@ new Vue({
                 this.text = '';
                 this.showNewModal = false;
             });
-//            setTimeout(this.getAll, 1000);
-//            this.updateSelection();
-//            setTimeout(() => {alert(this.transactions.length)}, 1000);
         },
         deleteTransaction: function () {
             axios.post('/lbcflba/api/delete', {'pk': this.pk}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
@@ -150,9 +152,6 @@ new Vue({
                 this.showModifyModal = false;
             });
         },
-        test: function () {
-            alert("testing testing");
-        },
         printerr: function (err_msg) {
             alert("prout\n\n" + err_msg);
         },
@@ -161,6 +160,7 @@ new Vue({
         },
     },
     mounted() {
+        this.getUserInfo();
         this.getAll();
     }
 })
