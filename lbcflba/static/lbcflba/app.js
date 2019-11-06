@@ -51,10 +51,10 @@ Vue.component('recap', {
         computeSum(transactions) {
             sum = 0;
             for (transaction of transactions) {
-                sum += transaction.amount
+                sum += parseFloat(transaction.amount)
             }
             this.sum = sum
-            return sum
+            return sum.toFixed(2)
         },
         getSumStyle(sum) {
             if (sum > 0) {
