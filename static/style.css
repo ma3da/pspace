@@ -18,6 +18,20 @@ html, body {
     border-collapse: collapse;
 }
 
+.transaction_table {
+    text-align:center;
+    width: 100%;
+    margin-bottom: 15px;
+    cursor: pointer;
+    cellspacing: 0px;
+    border-spacing:0px;
+}
+
+.transaction_table td, .transaction_table th {
+    padding:15px;
+    margin:0px;
+}
+
 .main_table td, .main_table th {
   text-align: center;
   vertical-align: middle;

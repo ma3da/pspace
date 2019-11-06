@@ -25,7 +25,7 @@ Vue.component('daily', {
             return "???"
         },
         getTimeStr(transaction) {
-            return moment(transaction.time).format('DD MMM[,] H[h]mm')
+            return moment(transaction.time).format('DD MMM[.] H[h]mm')
         },
         getAmountStyle(transaction, spenderId) {
             if (transaction.source == spenderId) {
@@ -33,21 +33,23 @@ Vue.component('daily', {
             } else {
                 color =  "MediumSeaGreen";
             }
-            return {color: color, background: "white", width: "10%"};
+            return {color: color, background: "white", width: "10%", "font-size": "1.2em"};
+        },
+        getStatusColor(status) {
+            return "Gray";
         },
     },
     props: ["transaction", "userinfo", "members"],
     template: `
-    <table class="main_table" style="border: 2px solid #eeeeee; color: Gray; background: #eeeeee">
+    <table class="transaction_table" :style="{border: '2px solid ' + getStatusColor(transaction.status), color: 'Gray'}">
         <tr>
-            <td rowspan="2" v-bind:style="getAmountStyle(transaction, userinfo.spenderId)"> {{ transaction.amount }} </td>
-            <td style="text-align: left"> {{ getMemberName(transaction.source, members) }} </td>
-            <td colspan="2" style="text-align: right"> {{ getTimeStr(transaction) }} </td>
+            <td rowspan="3" v-bind:style="getAmountStyle(transaction, userinfo.spenderId)"> {{ transaction.amount }} </td>
+            <td rowspan="2" colspan="2" style="min-width: 80%"> {{ transaction.text }} </td>
+            <td rowspan="3" :style="{width: '5%', background: getStatusColor(transaction.status), color: '#eeeeee'}" @click="$emit('showmodify', transaction.id)"> {{ transaction.status }} </td>
         </tr>
+        <tr></tr>
         <tr>
-            <td style="width: 80%"> {{ transaction.text }} </td>
-            <td> </td>
-            <td style="width: 10%" @click="$emit('showmodify', transaction.id)"> {{ transaction.status }} </td>
+            <td :style="{'font-size': '0.8em', 'vertical-align': 'bottom', 'padding-bottom':'0'}"> {{ getMemberName(transaction.source, members) }}, {{ getTimeStr(transaction) }} </td>
         </tr>
     </table>
     `
