@@ -19,39 +19,17 @@ Vue.component('daily', {
         getTimeStr(transaction) {
             return moment(transaction.time).format('DD MMM[,] H[h]mm')
         },
-        getName(user_id, users) {
-            for (user of users) {
-                if (user.id == user_id)
-                    return user.username;
-            }
-            return "unknown (" + user_id + ")";
-        },
-        getDirectionStr(transaction, users) {
-            if (transaction.source == users.me.id) {
-                return ' >> ' + this.getName(transaction.destination, users.contacts);
-            } else if (transaction.destination == users.me.id) {
-                return  ' << ' + this.getName(transaction.source, users.contacts);
-            } else {
-                return "???";
-            }
-        },
-        getAmountStyle(transaction, users) {
-            if (transaction.source == users.me.id) {
-                color = "Tomato";
-            } else if (transaction.destination == users.me.id) {
-                color =  "MediumSeaGreen";
-            } else {
-                color = "Gray";
-            }
+        getAmountStyle(transaction) {
+            color = "Gray";
             return {color: color, background: "white", width: "10%"};
         },
     },
-    props: ["transaction", "users"],
+    props: ["transaction"],
     template: `
     <table class="main_table" style="border: 2px solid #eeeeee; color: Gray; background: #eeeeee">
         <tr>
-            <td rowspan="2" v-bind:style="getAmountStyle(transaction, users)"> {{ transaction.amount }} </td>
-            <td style="text-align: left"> {{ getDirectionStr(transaction, users) }} </td>
+            <td rowspan="2" v-bind:style="getAmountStyle(transaction)"> {{ transaction.amount }} </td>
+            <td style="text-align: left"> >> </td>
             <td colspan="2" style="text-align: right"> {{ getTimeStr(transaction) }} </td>
         </tr>
         <tr>
@@ -70,17 +48,10 @@ Vue.component('recap', {
         }
     },
     methods: {
-        computeSum(transactions, users) {
+        computeSum(transactions) {
             sum = 0;
             for (transaction of transactions) {
-                if (transaction.source == users.me.id) {
-                coeff = -1
-                } else if (transaction.destination == users.me.id) {
-                    coeff = 1
-                } else {
-                    return "???";
-                }
-                sum += transaction.amount * coeff
+                sum += transaction.amount
             }
             this.sum = sum
             return sum
@@ -96,21 +67,21 @@ Vue.component('recap', {
             return {color: color};
         },
     },
-    props: ["transactions", "users"],
+    props: ["transactions"],
     template: `
     <table class="main_table" style="border: 1px solid #eeeeee">
         <tr>
-            <td v-bind:style="getSumStyle(sum)"> {{ computeSum(transactions, users) }}</td>
+            <td v-bind:style="getSumStyle(sum)"> {{ computeSum(transactions) }}</td>
         </tr>
     </table>
     `
 })
+
 new Vue({
     delimiters: ['[[', ']]'],
     el: '#app',
     data: {
         transactions: [],
-        users: {},
         text: '',
         other: 1,
         amount: 0,
@@ -120,7 +91,8 @@ new Vue({
         pk: null,
         groups: [],
         members: [],
-        selectedGroup: null,
+        selectedGroupId: null,
+        selectedGroupTransactions: [],
     },
     methods: {
         getAll: function () {
@@ -128,11 +100,17 @@ new Vue({
               .get('/lbcflba/api/all')
               .then(response => (this.transactions = response.data))
               .catch(error => printerr("getAll::transactions"));
-            axios
-              .get('/lbcflba/api/contacts/all')
-              .then(response => (this.users = response.data))
-              .catch(error => printerr("getAll::contacts"));
             this.getGroups();
+        },
+        groupGotSelected: function () {
+            this.getMembers(this.selectedGroupId);
+            transactions = [];
+            for (transaction of this.transactions) {
+                if (transaction.destination == this.selectedGroupId) {
+                    transactions.push(transaction);
+                }
+            }
+            this.selectedGroupTransactions = transactions;
         },
         getGroups: function() {
             axios
@@ -141,23 +119,24 @@ new Vue({
               .catch(error => printerr("status: " + error.response.status + "\n" + error.response.data));
         },
         getMembers: function(groupId) {
+            if (groupId == null) {
+                return [];
+            }
             axios
               .get('/lbcflba/api/members/' + groupId)
               .then(response => (this.members = response.data))
               .catch(error => printerr("status: " + error.response.status + "\n" + error.response.data));
         },
-        getMembersSelected: function() {
-            this.getMembers(this.selectedGroup);
-        },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
-                       {'other': this.other, 'text': this.text, 'amount': this.amount, 'direction': this.direction},
+                       {'destination': this.selectedGroupId, 'text': this.text, 'amount': this.amount},
                        {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => (this.getAll()))
             .catch(error => this.printerr("status: " + error.response.status + "\n" + error.response.data))
             .then(() => {
                 this.text = '';
                 this.showNewModal = false;
+                this.groupGotSelected();
             });
         },
         deleteTransaction: function () {

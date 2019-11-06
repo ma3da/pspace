@@ -7,9 +7,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import TransactionSerializer
+from .serializers import TransactionSerializer, GroupSerializer
 from . import app_name
-from .models import Transaction, to_list, Spender, Group
+from .models import Transaction, to_list, Spender, Group, to_entry
 
 
 class IndexView(generic.ListView):
@@ -29,26 +29,21 @@ class TransactionList(APIView):
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class TransactionNew(APIView):
     def post(self, request, format=None):
         try:
-            other_id = request.data["other"]
-            direction = request.data["direction"]
-            if direction == "from_user":
-                src_id, dest_id = request.user.id, other_id
-            elif direction == "to_user":
-                src_id, dest_id = other_id, request.user.id
-            else:
-                raise ValueError(f"Direction should be either 'from_user' or 'to_user', not: {direction}")
-            amount = request.data["amount"]
-            text = request.data["text"]
-
-            transaction = Transaction(source=get_user_model().objects.get(id=src_id),
-                                      destination=get_user_model().objects.get(id=dest_id),
-                                      amount=amount, text=text, time=datetime.datetime.now(), status=0)
-            transaction.save()
-            return Response()
+            main_user = get_main_user(request)
+            data = {
+                "source": Spender.objects.get(user=main_user).id,
+                "time": datetime.datetime.now(),
+                "status": 0,
+            }
+            data.update(request.data)
+            serializer = TransactionSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -92,6 +87,17 @@ class GroupList(APIView):
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def post(self, request, format=None):
+        try:
+            data = {"members": to_entry(request.data["member_ids"])}
+            serializer = GroupSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class MemberList(APIView):
     def get(self, request, group_id, format=None):
@@ -100,5 +106,4 @@ class MemberList(APIView):
             users = (Spender.objects.get(id=user_id).user for user_id in group_member_ids)
             return Response(list(map(_user2json, users)))
         except Exception as e:
-            print(e)
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

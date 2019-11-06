@@ -48,23 +48,22 @@
         <p>
             <a href="#" class="button" @click="showNewModal = true">new</a>
             <a href="{% url 'index' %}" class="button">menu</a>
-            [[ users.me.username ]]
+            [[ selectedGroupId ]]
         </p>
     </div>
     <div class="centering">
         [[ groups ]]
-        [[ selectedGroup ]]
+        [[ selectedGroupId ]]
         [[ members ]]
-        <select v-model="selectedGroup" @change="getMembersSelected()">
+        <select v-model="selectedGroupId" @change="groupGotSelected()">
             <option v-for="group in groups" :value="group">[[ group ]]</option>
         </select>
     </div>
     <div class="centering">
-        <recap :transactions="transactions" :users="users"></recap>
+        <recap :transactions="selectedGroupTransactions"></recap>
         <br>
-        <daily v-for="transaction in transactions"
+        <daily v-for="transaction in selectedGroupTransactions"
            :transaction="transaction"
-           :users="users"
            @showModify="showModifyModal = true; pk = $event">
         </daily>
     </div>
@@ -72,13 +71,6 @@
     <modal v-if="showNewModal" @close="showNewModal = false">
         <h3 slot="header">new transaction</h3>
         <p slot="body">
-            <select v-model="direction">
-                <option value="to_user">from</option>
-                <option value="from_user">to</option>
-            </select>
-            <select v-model="other">
-                <option v-for="user in members" :value="user.id">[[ user.username ]]</option>
-            </select>
             <br>
             <input type="number" v-model="amount" step=".01">
             <br>
