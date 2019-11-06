@@ -46,18 +46,17 @@
 <div id="app">
     <div class="centering">
         <p>
-            <a href="#" class="button" @click="showNewModal = true">new</a>
+            <a href="#" class="button" @click="showNewModal = true" v-if="selectedGroupId > -1">new</a>
             <a href="{% url 'index' %}" class="button">menu</a>
         </p>
     </div>
     <div class="centering">
-        [[ userInfo ]] <br>
-        [[ members ]] <br>
-        [[ transactions ]] <br>
         <select v-model="selectedGroupId" @change="updateSelection()">
-            <option v-for="group in groups" :value="group">[[ group ]]</option>
+            <option value="-1">select a group</option>
+            <option v-for="group in groups" :value="group.id">[[ group.name ]]</option>
         </select>
     </div>
+    <br>
     <div class="centering">
         <recap :transactions="selectedGroupTransactions"
                :userinfo="userInfo">
@@ -66,6 +65,7 @@
         <daily v-for="transaction in selectedGroupTransactions"
                :transaction="transaction"
                :userinfo="userInfo"
+               :members="members"
                @showModify="showModifyModal = true; pk = $event">
         </daily>
     </div>
@@ -96,8 +96,8 @@
           </button>
       </span>
     </modal>
+    
 </div>
-
 <script src="{% static 'lbcflba/app.js' %}"></script>
 
 </body>

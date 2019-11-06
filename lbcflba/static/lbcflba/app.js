@@ -16,6 +16,14 @@ Vue.component('modal', {
 
 Vue.component('daily', {
     methods: {
+        getMemberName: function(mId, members) {
+            for (member of members) {
+                if (member.spenderId == mId) {
+                    return member.username;
+                }
+            }
+            return "???"
+        },
         getTimeStr(transaction) {
             return moment(transaction.time).format('DD MMM[,] H[h]mm')
         },
@@ -28,12 +36,12 @@ Vue.component('daily', {
             return {color: color, background: "white", width: "10%"};
         },
     },
-    props: ["transaction", "userinfo"],
+    props: ["transaction", "userinfo", "members"],
     template: `
     <table class="main_table" style="border: 2px solid #eeeeee; color: Gray; background: #eeeeee">
         <tr>
             <td rowspan="2" v-bind:style="getAmountStyle(transaction, userinfo.spenderId)"> {{ transaction.amount }} </td>
-            <td style="text-align: left"> {{ userinfo.username }} </td>
+            <td style="text-align: left"> {{ getMemberName(transaction.source, members) }} </td>
             <td colspan="2" style="text-align: right"> {{ getTimeStr(transaction) }} </td>
         </tr>
         <tr>
@@ -52,10 +60,11 @@ Vue.component('recap', {
         }
     },
     methods: {
-        computeSum(transactions) {
+        computeSum(transactions, spenderId) {
             sum = 0;
             for (transaction of transactions) {
-                sum += parseFloat(transaction.amount)
+                coeff = transaction.source == spenderId ? -1 : 1
+                sum += parseFloat(transaction.amount) * coeff
             }
             this.sum = sum
             return sum.toFixed(2)
@@ -75,7 +84,7 @@ Vue.component('recap', {
     template: `
     <table class="main_table" style="border: 1px solid #eeeeee">
         <tr>
-            <td v-bind:style="getSumStyle(sum)"> {{ computeSum(transactions) }}</td>
+            <td v-bind:style="getSumStyle(sum)"> {{ computeSum(transactions, userinfo.spenderId) }}</td>
         </tr>
     </table>
     `
@@ -96,7 +105,7 @@ new Vue({
         pk: null,
         groups: [],
         members: [],
-        selectedGroupId: null,
+        selectedGroupId: -1,
         selectedGroupTransactions: [],
     },
     methods: {
@@ -108,9 +117,12 @@ new Vue({
         },
         updateSelection: function () {
             sid = this.selectedGroupId
-            if (sid != null) {
+            if (sid > -1) {
                 this.getMembers(sid);
-                this.selectedGroupTransactions = this.transactions.filter(t => (t.destination == sid))
+                this.selectedGroupTransactions = this.transactions.filter(t => (t.destination == sid));
+            } else {
+                this.members = [];
+                this.selectedGroupTransactions = [];
             }
         },
         getGroups: function() {
@@ -126,12 +138,10 @@ new Vue({
                   .catch(this.printResponseError);
         },
         getMembers: function(groupId) {
-            if (groupId != null) {
-                axios
-                  .get('/lbcflba/api/members/' + groupId)
-                  .then(response => (this.members = response.data))
-                  .catch(this.printResponseError);
-            }
+            axios
+              .get('/lbcflba/api/members/' + groupId)
+              .then(response => (this.members = response.data))
+              .catch(this.printResponseError);
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',

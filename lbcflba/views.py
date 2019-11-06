@@ -20,6 +20,10 @@ def _user2json(user):
     return {"spenderId": user.spender.id, "username": user.username}
 
 
+def _spender2json(spender):
+    return {"spenderId": spender.id, "username": spender.user.username}
+
+
 class IndexView(generic.ListView):
     template_name = f"{app_name}/index.html"
     context_object_name = 'users'
@@ -86,10 +90,22 @@ class ContactList(APIView):
 
 class GroupList(APIView):
     def get(self, request, format=None):
+        """
+        :return: json [{"members":[Spender_json], "id":int}]
+        """
         try:
             spender = get_main_user(request).spender
-            groups = to_list(spender.groups)
-            return Response(groups)
+            groups = Group.objects.filter(pk__in=to_list(spender.groups))
+            serializer = GroupSerializer(groups, many=True)
+            member_ids = set()
+            for group in serializer.data:
+                member_ids.update(to_list(group["members"]))
+            spenders = Spender.objects.filter(pk__in=member_ids)
+            spender_by_id = {member.id: member for member in spenders}
+            for group in serializer.data:
+                group["members"] = [_spender2json(spender_by_id[member_id]) for member_id in to_list(group["members"])]
+                group["name"] = ", ".join(spender["username"] for spender in group["members"])
+            return Response(serializer.data)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
