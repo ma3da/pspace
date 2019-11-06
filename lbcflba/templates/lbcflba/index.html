@@ -73,6 +73,9 @@
     <modal v-if="showNewModal" @close="showNewModal = false">
         <h3 slot="header">new transaction</h3>
         <p slot="body">
+            <select v-model="sourceId">
+                <option v-for="member in members" :value="member.spenderId">[[ member.username ]]</option>
+            </select>
             <br>
             <input type="number" v-model="amount" step=".01">
             <br>

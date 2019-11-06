@@ -47,18 +47,16 @@ class TransactionList(APIView):
 
     def post(self, request, format=None):
         try:
-            main_user = get_main_user(request)
             data = {
-                "source": Spender.objects.get(user=main_user).id,
                 "time": datetime.datetime.now(),
                 "status": 0,
             }
             data.update(request.data)
             serializer = TransactionSerializer(data=data)
             if serializer.is_valid():
+                # todo check source in destination
                 serializer.save()
                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

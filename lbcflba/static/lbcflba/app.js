@@ -86,6 +86,7 @@ new Vue({
     el: '#app',
     data: {
         userInfo: {},
+        sourceId: 2,
         transactions: [],
         text: '',
         other: 1,
@@ -121,7 +122,7 @@ new Vue({
         getUserInfo: function() {
             axios
                   .get('/lbcflba/api/userinfo')
-                  .then(response => (this.userInfo = response.data))
+                  .then(response => {this.userInfo = response.data; this.sourceId = this.userInfo.spenderId;})
                   .catch(this.printResponseError);
         },
         getMembers: function(groupId) {
@@ -134,7 +135,7 @@ new Vue({
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
-                       {'destination': this.selectedGroupId, 'text': this.text, 'amount': this.amount},
+                       {'source': this.sourceId, 'destination': this.selectedGroupId, 'text': this.text, 'amount': this.amount},
                        {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getAll())
             .catch(this.printResponseError)
