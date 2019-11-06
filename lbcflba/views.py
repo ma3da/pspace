@@ -60,7 +60,7 @@ class TransactionDelete(APIView):
 
 
 def _user2json(user):
-    return {"id": user.id, "username": user.username}
+    return {"id": user.spender.id, "username": user.username}
 
 
 def get_main_user(request):

@@ -48,14 +48,11 @@
         <p>
             <a href="#" class="button" @click="showNewModal = true">new</a>
             <a href="{% url 'index' %}" class="button">menu</a>
-            [[ selectedGroupId ]]
         </p>
     </div>
     <div class="centering">
-        [[ groups ]]
-        [[ selectedGroupId ]]
         [[ members ]]
-        <select v-model="selectedGroupId" @change="groupGotSelected()">
+        <select v-model="selectedGroupId" @change="updateSelection()">
             <option v-for="group in groups" :value="group">[[ group ]]</option>
         </select>
     </div>

@@ -98,25 +98,25 @@ new Vue({
         getAll: function () {
             axios
               .get('/lbcflba/api/all')
-              .then(response => (this.transactions = response.data))
+              .then(response => {this.transactions = response.data; this.getGroups(); this.updateSelection();})
               .catch(error => printerr("getAll::transactions"));
-            this.getGroups();
         },
-        groupGotSelected: function () {
-            this.getMembers(this.selectedGroupId);
-            transactions = [];
-            for (transaction of this.transactions) {
-                if (transaction.destination == this.selectedGroupId) {
-                    transactions.push(transaction);
+        updateSelection: function () {
+            if (this.selectedGroupId != null) {
+                this.getMembers(this.selectedGroupId);
+                this.selectedGroupTransactions = [];
+                for (transaction of this.transactions) {
+                    if (transaction.destination == this.selectedGroupId) {
+                        this.selectedGroupTransactions.push(transaction);
+                    }
                 }
             }
-            this.selectedGroupTransactions = transactions;
         },
         getGroups: function() {
             axios
               .get('/lbcflba/api/groups')
               .then(response => (this.groups = response.data))
-              .catch(error => printerr("status: " + error.response.status + "\n" + error.response.data));
+              .catch(this.printResponseError)
         },
         getMembers: function(groupId) {
             if (groupId == null) {
@@ -125,24 +125,26 @@ new Vue({
             axios
               .get('/lbcflba/api/members/' + groupId)
               .then(response => (this.members = response.data))
-              .catch(error => printerr("status: " + error.response.status + "\n" + error.response.data));
+              .catch(this.printResponseError)
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
                        {'destination': this.selectedGroupId, 'text': this.text, 'amount': this.amount},
                        {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => (this.getAll()))
-            .catch(error => this.printerr("status: " + error.response.status + "\n" + error.response.data))
+            .then(response => this.getAll())
+            .catch(this.printResponseError)
             .then(() => {
                 this.text = '';
                 this.showNewModal = false;
-                this.groupGotSelected();
             });
+//            setTimeout(this.getAll, 1000);
+//            this.updateSelection();
+//            setTimeout(() => {alert(this.transactions.length)}, 1000);
         },
         deleteTransaction: function () {
             axios.post('/lbcflba/api/delete', {'pk': this.pk}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => (this.getAll()))
-            .catch(error => this.printerr("status: " + error.response.status + "\n" + error.response.data))
+            .catch(this.printResponseError)
             .then(() => {
                 this.pk = null;
                 this.showModifyModal = false;
@@ -152,7 +154,10 @@ new Vue({
             alert("testing testing");
         },
         printerr: function (err_msg) {
-            alert("fail...\n" + err_msg);
+            alert("prout\n\n" + err_msg);
+        },
+        printResponseError: function (error) {
+            this.printerr("status: " + error.response.status + "\n\n" + JSON.stringify(error.response.data));
         },
     },
     mounted() {
