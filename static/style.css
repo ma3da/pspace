@@ -32,6 +32,16 @@ html, body {
     margin:0px;
 }
 
+.recap_table {
+    text-align:center;
+    width: 50%;
+    margin:auto;
+    margin-bottom: 15px;
+    cursor: pointer;
+    cellspacing: 0px;
+    border-spacing:0px;
+}
+
 .main_table td, .main_table th {
   text-align: center;
   vertical-align: middle;

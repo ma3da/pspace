@@ -62,14 +62,30 @@ Vue.component('recap', {
         }
     },
     methods: {
-        computeSum(transactions, spenderId) {
-            sum = 0;
-            for (transaction of transactions) {
-                coeff = transaction.source == spenderId ? -1 : 1
-                sum += parseFloat(transaction.amount) * coeff
+        getMemberName: function(mId, members) {
+            for (member of members) {
+                if (member.spenderId == mId) {
+                    return member.username;
+                }
             }
-            this.sum = sum
-            return sum.toFixed(2)
+            return "???"
+        },
+        computeShares(transactions, spenderId, members) {
+            shares = {};
+            total = 0;
+            for (t of transactions) {
+                if (!(t.source in shares)) {
+                    shares[t.source] = 0;
+                }
+                shares[t.source] += parseFloat(t.amount);
+                total += parseFloat(t.amount);
+            }
+            mean = total / members.length;
+            for (id in shares) {
+                shares[id] -= mean;
+                shares[id] = shares[id].toFixed(2);
+            }
+            return shares;
         },
         getSumStyle(sum) {
             if (sum > 0) {
@@ -81,12 +97,24 @@ Vue.component('recap', {
             }
             return {color: color};
         },
+        getArrow(amount) {
+            if (amount > 0) {
+                symbol =  "<=";
+            } else if (amount < 0) {
+                symbol =  "=>";
+            } else {
+                symbol = "==";
+            }
+            return symbol;
+        }
     },
-    props: ["transactions", "userinfo"],
+    props: ["transactions", "userinfo", "members"],
     template: `
-    <table class="main_table" style="border: 1px solid #eeeeee">
-        <tr>
-            <td v-bind:style="getSumStyle(sum)"> {{ computeSum(transactions, userinfo.spenderId) }}</td>
+    <table class="recap_table" style="border: 1px solid #eeeeee">
+        <tr v-for="(amount, id) in computeShares(transactions, userinfo.spenderId, members)">
+            <td> {{ getMemberName(id, members) }} </td>
+            <td> {{ getArrow(parseFloat(amount)) }} </td>
+            <td :style="getSumStyle(amount)"> {{ amount }} </td>
         </tr>
     </table>
     `
@@ -97,7 +125,7 @@ new Vue({
     el: '#app',
     data: {
         userInfo: {},
-        sourceId: 2,
+        sourceId: null,
         transactions: [],
         text: '',
         other: 1,
@@ -109,6 +137,7 @@ new Vue({
         members: [],
         selectedGroupId: -1,
         selectedGroupTransactions: [],
+        status: -1,
     },
     methods: {
         getAll: function () {
@@ -120,12 +149,19 @@ new Vue({
         updateSelection: function () {
             sid = this.selectedGroupId
             if (sid > -1) {
-                this.getMembers(sid);
-                this.selectedGroupTransactions = this.transactions.filter(t => (t.destination == sid));
+                this.members = this.getMembers(sid);
+                this.selectedGroupTransactions = this.transactions
+                    .filter(t => (t.destination == sid))
+                    .filter(this.isSelected);
             } else {
                 this.members = [];
                 this.selectedGroupTransactions = [];
             }
+        },
+        isSelected: function(transaction) {
+            if (this.status < 0)
+                return true;
+            return this.status == transaction.status;
         },
         getGroups: function() {
             axios
@@ -140,10 +176,11 @@ new Vue({
                   .catch(this.printResponseError);
         },
         getMembers: function(groupId) {
-            axios
-              .get('/lbcflba/api/members/' + groupId)
-              .then(response => (this.members = response.data))
-              .catch(this.printResponseError);
+            for (group of this.groups)
+                if (group.id == groupId)
+                    return group.members;
+            this.printerr("group not found: " + groupId);
+            return [];
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
