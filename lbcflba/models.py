@@ -28,7 +28,7 @@ class Group(models.Model):
     def add_category(self, category_name):
         categories = to_dict(self.categoryDict)
         if category_name not in categories.values():
-            categories[max(categories.keys(), default=1) + 1] = category_name
+            categories[int(max(categories.keys(), default=1)) + 1] = category_name
         self.categoryDict = to_entry_from_dict(categories)
 
 

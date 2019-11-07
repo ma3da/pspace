@@ -36,6 +36,14 @@ class IndexView(generic.ListView):
         return []
 
 
+class OptionsView(generic.ListView):
+    template_name = f"{app_name}/options.html"
+    context_object_name = 'users'
+
+    def get_queryset(self):
+        return []
+
+
 class UserInfo(APIView):
     def get(self, request, format=None):
         try:
@@ -155,3 +163,7 @@ class GroupCategory(APIView):
             return Response(GroupSerializer(group).data, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def delete(self, request, format=None):
+        print(request)
+        return Response("hello")

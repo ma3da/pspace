@@ -160,7 +160,7 @@ new Vue({
                 this.selectedGroupTransactions = this.transactions
                     .filter(t => (t.destination == sid))
                     .filter(this.isSelected);
-                this.categoryDict = this.groupDict[sid].categoryDict
+                this.categoryDict = this.groupDict[sid].categoryDict;
             } else {
                 this.members = [];
                 this.selectedGroupTransactions = [];
@@ -187,9 +187,9 @@ new Vue({
         },
         getUserInfo: function() {
             axios
-                  .get('/lbcflba/api/userinfo')
-                  .then(response => {this.userInfo = response.data; this.sourceId = this.userInfo.spenderId;})
-                  .catch(this.printResponseError);
+              .get('/lbcflba/api/userinfo')
+              .then(response => {this.userInfo = response.data; this.sourceId = this.userInfo.spenderId;})
+              .catch(this.printResponseError);
         },
         getMembers: function(groupId) {
             for (group of this.groups)
@@ -220,12 +220,13 @@ new Vue({
         },
         newCategory: function (groupId, categoryName) {
             axios.post('/lbcflba/api/group/category/new', {'groupId': groupId, 'categoryName': categoryName}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => (this.getAll()))
-            .catch(this.printResponseError)
-            .then(() => {
-                this.pk = null;
-                this.showModifyModal = false;
-            });
+            .then(response => this.getAll())
+            .catch(this.printResponseError);
+        },
+        deleteCategory: function (groupId, categoryId) {
+            axios.delete('/lbcflba/api/group/category/delete', {'groupId': groupId, 'categoryId': categoryId}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => this.getAll())
+            .catch(this.printResponseError);
         },
         printerr: function (err_msg) {
             alert("prout\n\n" + err_msg);

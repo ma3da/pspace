@@ -48,7 +48,7 @@
         <p>
             <a href="{% url 'index' %}" class="button">menu</a>
             <a href="#" class="button" @click="showNewModal = true" v-if="selectedGroupId > -1">new</a>
-            <a href="#" class="button" @click="showOptionModal = true" v-if="selectedGroupId > -1">options</a>
+            <a href="{% url 'lbcflba:options' %}" class="button">options</a>
         </p>
     </div>
     <div class="centering">
@@ -59,6 +59,10 @@
         <select v-model="status" @change="updateSelection()">
             <option value="-1">all status</option>
             <option v-for="i in [0, 1]" :value="i">[[ i ]]</option>
+        </select>
+        <select v-model="categoryId" @change="updateSelection()">
+            <option value="-1">all cats</option>
+            <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
         </select>
     </div>
     <br>
@@ -116,7 +120,6 @@
           </button>
         </p>
     </modal>
-[[ categoryDict ]]
 </div>
 <script src="{% static 'lbcflba/app.js' %}"></script>
 
