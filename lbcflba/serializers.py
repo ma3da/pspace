@@ -8,6 +8,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('id', 'source', 'destination', 'amount', 'text', 'time', 'status')
+        extra_kwargs = {"text": {"allow_blank": True}}
 
 
 class GroupSerializer(serializers.ModelSerializer):
