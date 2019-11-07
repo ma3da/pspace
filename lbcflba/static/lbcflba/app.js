@@ -136,7 +136,6 @@ new Vue({
         selectedGroupId: -1,
         selectedGroupTransactions: [],
         status: -1,
-        categoryDict: {},
         categoryId: -1,
         groupDict: {},
 
@@ -145,6 +144,15 @@ new Vue({
         showNewModal: false,
         showModifyModal: false,
         showOptionModal: false,
+    },
+    computed: {
+        categoryDict: function() {
+            sid = this.selectedGroupId
+                if (sid > -1)
+                    return this.groupDict[this.selectedGroupId].categoryDict;
+                else
+                    return {};
+        }
     },
     methods: {
         getAll: function () {
@@ -160,11 +168,9 @@ new Vue({
                 this.selectedGroupTransactions = this.transactions
                     .filter(t => (t.destination == sid))
                     .filter(this.isSelected);
-                this.categoryDict = this.groupDict[sid].categoryDict;
             } else {
                 this.members = [];
                 this.selectedGroupTransactions = [];
-                this.categoryDict = {}
             }
         },
         isSelected: function(transaction) {
@@ -224,7 +230,7 @@ new Vue({
             .catch(this.printResponseError);
         },
         deleteCategory: function (groupId, categoryId) {
-            axios.delete('/lbcflba/api/group/category/delete', {'groupId': groupId, 'categoryId': categoryId}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            axios.post('/lbcflba/api/group/category/delete', {'groupId': groupId, 'categoryId': categoryId}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getAll())
             .catch(this.printResponseError);
         },

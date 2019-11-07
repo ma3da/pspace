@@ -120,6 +120,7 @@ class GroupList(APIView):
                 group["name"] = ", ".join(spender["username"] for spender in group["members"])
             # categoryDict inflation
             for group in serializer.data:
+                print(group["categoryDict"])
                 group["categoryDict"] = to_dict(group["categoryDict"])
                 group["categoryDict"].update({0: "uncategorized"})
             return Response(serializer.data)
@@ -164,6 +165,17 @@ class GroupCategory(APIView):
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def delete(self, request, format=None):
-        print(request)
-        return Response("hello")
+
+class GroupCategoryDelete(APIView):
+    def post(self, request, format=None):
+        try:
+            group_id = int(request.data["groupId"])
+            category_id = int(request.data["categoryId"])
+            if group_id not in allowed_groups(get_main_user(request)):
+                raise PermissionError("Nope")
+            group = Group.objects.get(id=group_id)
+            group.delete_category(category_id=category_id)
+            group.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

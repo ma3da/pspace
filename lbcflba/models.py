@@ -28,7 +28,13 @@ class Group(models.Model):
     def add_category(self, category_name):
         categories = to_dict(self.categoryDict)
         if category_name not in categories.values():
-            categories[int(max(categories.keys(), default=1)) + 1] = category_name
+            categories[max(categories.keys(), default=1) + 1] = category_name
+        self.categoryDict = to_entry_from_dict(categories)
+
+    def delete_category(self, category_id):
+        categories = to_dict(self.categoryDict)
+        if category_id in categories:
+            categories.pop(category_id)
         self.categoryDict = to_entry_from_dict(categories)
 
 
@@ -56,8 +62,8 @@ def to_entry_from_list(list_):
 
 
 def to_dict(entry):
-    return json.loads(entry)
+    return {int(k): v for k, v in json.loads(entry).items()}
 
 
 def to_entry_from_dict(dict_):
-    return json.dumps(dict_)
+    return json.dumps({str(k): v for k, v in dict_.items()})
