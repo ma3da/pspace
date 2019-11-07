@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from .serializers import TransactionSerializer, GroupSerializer
 from . import app_name
-from .models import Transaction, to_list, Spender, Group, to_entry
+from .models import Transaction, to_list, Spender, Group, to_entry_from_list, to_dict, to_entry_from_dict
 
 
 def get_main_user(request):
@@ -22,6 +22,10 @@ def _user2json(user):
 
 def _spender2json(spender):
     return {"spenderId": spender.id, "username": spender.user.username}
+
+
+def allowed_groups(user):
+    return to_list(user.spender.groups)
 
 
 class IndexView(generic.ListView):
@@ -98,6 +102,7 @@ class GroupList(APIView):
             groups = Group.objects.filter(pk__in=to_list(spender.groups))
             serializer = GroupSerializer(groups, many=True)
             member_ids = set()
+            # members (Spender) inflation + group name
             for group in serializer.data:
                 member_ids.update(to_list(group["members"]))
             spenders = Spender.objects.filter(pk__in=member_ids)
@@ -105,13 +110,20 @@ class GroupList(APIView):
             for group in serializer.data:
                 group["members"] = [_spender2json(spender_by_id[member_id]) for member_id in to_list(group["members"])]
                 group["name"] = ", ".join(spender["username"] for spender in group["members"])
+            # categoryDict inflation
+            for group in serializer.data:
+                group["categoryDict"] = to_dict(group["categoryDict"])
+                group["categoryDict"].update({0: "uncategorized"})
             return Response(serializer.data)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None):
         try:
-            data = {"members": to_entry(request.data["member_ids"])}
+            data = {
+                "members": to_entry_from_list(request.data["member_ids"]),
+                "categoryDict": to_entry_from_dict(request.data["categoryDict"]),
+            }
             serializer = GroupSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
@@ -127,5 +139,19 @@ class MemberList(APIView):
             group_member_ids = to_list(Group.objects.get(id=group_id).members)
             users = (Spender.objects.get(id=user_id).user for user_id in group_member_ids)
             return Response(list(map(_user2json, users)))
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GroupCategory(APIView):
+    def post(self, request, format=None):
+        try:
+            group_id = int(request.data["groupId"])
+            if group_id not in allowed_groups(get_main_user(request)):
+                raise PermissionError("Nope")
+            group = Group.objects.get(id=group_id)
+            group.add_category(category_name=request.data["categoryName"])
+            group.save()
+            return Response(GroupSerializer(group).data, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

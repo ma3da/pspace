@@ -46,8 +46,9 @@
 <div id="app">
     <div class="centering">
         <p>
-            <a href="#" class="button" @click="showNewModal = true" v-if="selectedGroupId > -1">new</a>
             <a href="{% url 'index' %}" class="button">menu</a>
+            <a href="#" class="button" @click="showNewModal = true" v-if="selectedGroupId > -1">new</a>
+            <a href="#" class="button" @click="showOptionModal = true" v-if="selectedGroupId > -1">options</a>
         </p>
     </div>
     <div class="centering">
@@ -71,6 +72,7 @@
                :transaction="transaction"
                :userinfo="userInfo"
                :members="members"
+               :categorydict="categoryDict"
                @showmodify="showModifyModal = true; pk = $event">
         </daily>
     </div>
@@ -81,8 +83,11 @@
             <select v-model="sourceId">
                 <option v-for="member in members" :value="member.spenderId">[[ member.username ]]</option>
             </select>
-            <br>
             <input type="number" v-model="amount" step=".01">
+            <br>
+            <select v-model="categoryId">
+                <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
+            </select>
             <br>
             <textarea v-model="text"></textarea>
         </p>
@@ -101,7 +106,17 @@
           </button>
       </span>
     </modal>
-
+        </modal>
+        <modal v-if="showOptionModal" @close="showOptionModal = false">
+        <h3 slot="header">Options</h3>
+        <p slot="body">
+            <input v-model="newCategoryName" placeholder="new category">
+            <button @click="newCategory(selectedGroupId, newCategoryName)">
+            save
+          </button>
+        </p>
+    </modal>
+[[ categoryDict ]]
 </div>
 <script src="{% static 'lbcflba/app.js' %}"></script>
 

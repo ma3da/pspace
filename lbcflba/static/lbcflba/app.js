@@ -39,7 +39,7 @@ Vue.component('daily', {
             return "Gray";
         },
     },
-    props: ["transaction", "userinfo", "members"],
+    props: ["transaction", "userinfo", "members", "categorydict"],
     template: `
     <table class="transaction_table" :style="{border: '2px solid ' + getStatusColor(transaction.status), color: 'Gray'}">
         <tr>
@@ -49,7 +49,7 @@ Vue.component('daily', {
         </tr>
         <tr></tr>
         <tr>
-            <td :style="{'font-size': '0.8em', 'vertical-align': 'bottom', 'padding-bottom':'0'}"> {{ getMemberName(transaction.source, members) }}, {{ getTimeStr(transaction) }} </td>
+            <td :style="{'font-size': '0.8em', 'vertical-align': 'bottom', 'padding-bottom':'0'}"> {{ getMemberName(transaction.source, members) }}, {{ getTimeStr(transaction) }}, {{ categorydict[transaction.category] }} </td>
         </tr>
     </table>
     `
@@ -130,14 +130,21 @@ new Vue({
         text: '',
         other: 1,
         amount: 0,
-        showNewModal: false,
-        showModifyModal: false,
         pk: null,
         groups: [],
         members: [],
         selectedGroupId: -1,
         selectedGroupTransactions: [],
         status: -1,
+        categoryDict: {},
+        categoryId: -1,
+        groupDict: {},
+
+        newCategoryName: null,
+
+        showNewModal: false,
+        showModifyModal: false,
+        showOptionModal: false,
     },
     methods: {
         getAll: function () {
@@ -153,9 +160,11 @@ new Vue({
                 this.selectedGroupTransactions = this.transactions
                     .filter(t => (t.destination == sid))
                     .filter(this.isSelected);
+                this.categoryDict = this.groupDict[sid].categoryDict
             } else {
                 this.members = [];
                 this.selectedGroupTransactions = [];
+                this.categoryDict = {}
             }
         },
         isSelected: function(transaction) {
@@ -166,8 +175,15 @@ new Vue({
         getGroups: function() {
             axios
               .get('/lbcflba/api/groups')
-              .then(response => (this.groups = response.data))
-              .catch(this.printResponseError)
+              .then(this.updateGroups)
+              .catch(this.printResponseError);
+        },
+        updateGroups: function(response) {
+            this.groups = response.data;
+            this.groupDict = {};
+            for (group of this.groups) {
+                this.groupDict[group.id.toString()] = group;
+            }
         },
         getUserInfo: function() {
             axios
@@ -184,7 +200,7 @@ new Vue({
         },
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
-                       {'source': this.sourceId, 'destination': this.selectedGroupId, 'text': this.text, 'amount': this.amount},
+                       {'source': this.sourceId, 'destination': this.selectedGroupId, 'text': this.text, 'amount': this.amount, 'category': this.categoryId},
                        {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getAll())
             .catch(this.printResponseError)
@@ -195,6 +211,15 @@ new Vue({
         },
         deleteTransaction: function () {
             axios.post('/lbcflba/api/delete', {'pk': this.pk}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => (this.getAll()))
+            .catch(this.printResponseError)
+            .then(() => {
+                this.pk = null;
+                this.showModifyModal = false;
+            });
+        },
+        newCategory: function (groupId, categoryName) {
+            axios.post('/lbcflba/api/group/category/new', {'groupId': groupId, 'categoryName': categoryName}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => (this.getAll()))
             .catch(this.printResponseError)
             .then(() => {

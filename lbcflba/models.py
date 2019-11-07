@@ -1,4 +1,5 @@
 import enum
+import json
 
 from django.conf import settings
 from django.db import models
@@ -22,6 +23,13 @@ class Spender(models.Model):
 
 class Group(models.Model):
     members = models.TextField()
+    categoryDict = models.TextField(default="{}")
+
+    def add_category(self, category_name):
+        categories = to_dict(self.categoryDict)
+        if category_name not in categories.values():
+            categories[max(categories.keys(), default=1) + 1] = category_name
+        self.categoryDict = to_entry_from_dict(categories)
 
 
 class Transaction(models.Model):
@@ -31,6 +39,7 @@ class Transaction(models.Model):
     destination = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="+")
     amount = models.DecimalField(max_digits=14, decimal_places=2)
     text = models.TextField()
+    category = models.PositiveSmallIntegerField(default=0)
     time = models.DateTimeField()
     status = models.PositiveSmallIntegerField()
 
@@ -42,5 +51,13 @@ def to_list(entry):
     return list(map(int, entry.split(_SEPARATOR)))
 
 
-def to_entry(list_):
+def to_entry_from_list(list_):
     return _SEPARATOR.join(map(str, list_))
+
+
+def to_dict(entry):
+    return json.loads(entry)
+
+
+def to_entry_from_dict(dict_):
+    return json.dumps(dict_)

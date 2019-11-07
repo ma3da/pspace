@@ -7,11 +7,11 @@ from .models import Transaction, Group
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ('id', 'source', 'destination', 'amount', 'text', 'time', 'status')
+        fields = "__all__"
         extra_kwargs = {"text": {"allow_blank": True}}
 
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ("id", "members")
+        fields = "__all__"
