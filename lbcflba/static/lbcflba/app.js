@@ -31,7 +31,7 @@ Vue.component('daily', {
             if (transaction.source == spenderId) {
                 color = "Tomato";
             } else {
-                color =  "MediumSeaGreen";
+                color =  "CornFlowerBlue";
             }
             return {color: color, background: "white", width: "10%", "font-size": "1.2em"};
         },
@@ -70,13 +70,13 @@ Vue.component('recap', {
             }
             return "???"
         },
-        computeShares(transactions, spenderId, members) {
+        computeShares(transactions, members) {
             shares = {};
+            for (member of members) {
+                shares[member.spenderId] = 0
+            }
             total = 0;
             for (t of transactions) {
-                if (!(t.source in shares)) {
-                    shares[t.source] = 0;
-                }
                 shares[t.source] += parseFloat(t.amount);
                 total += parseFloat(t.amount);
             }
@@ -111,7 +111,7 @@ Vue.component('recap', {
     props: ["transactions", "userinfo", "members"],
     template: `
     <table class="recap_table" style="border: 1px solid #eeeeee">
-        <tr v-for="(amount, id) in computeShares(transactions, userinfo.spenderId, members)">
+        <tr v-for="(amount, id) in computeShares(transactions, members)">
             <td> {{ getMemberName(id, members) }} </td>
             <td> {{ getArrow(parseFloat(amount)) }} </td>
             <td :style="getSumStyle(amount)"> {{ amount }} </td>
