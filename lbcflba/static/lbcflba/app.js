@@ -125,99 +125,94 @@ new Vue({
     el: '#app',
     data: {
         userInfo: {},
-        sourceId: null,
         transactions: [],
-        text: '',
-        other: 1,
-        amount: 0,
         pk: null,
         groups: [],
-        members: [],
         selectedGroupId: -1,
-        selectedGroupTransactions: [],
+
         status: -1,
         categoryId: -1,
-        groupDict: {},
 
-        newCategoryName: null,
+        newData: {
+            sourceId: null,
+            text: '',
+            amount: 0,
+            categoryId: 0,
+        },
 
         showNewModal: false,
         showModifyModal: false,
-        showOptionModal: false,
+        showOptions: false,
     },
     computed: {
         categoryDict: function() {
-            sid = this.selectedGroupId
+            sid = this.selectedGroupId;
                 if (sid > -1)
                     return this.groupDict[this.selectedGroupId].categoryDict;
-                else
-                    return {};
-        }
+                return {};
+        },
+        groupDict: function() {
+            d = {};
+            for (group of this.groups) {
+                d[group.id.toString()] = group;
+            }
+            return d;
+        },
+        selectedGroupTransactions: function() {
+            sid = this.selectedGroupId;
+            if (sid > -1)
+                return this.transactions
+                  .filter(t => (t.destination == sid))
+                  .filter(this.isSelected);
+            return [];
+        },
+        members: function() {
+            sid = this.selectedGroupId
+            if (sid > -1);
+                return this.groupDict[sid].members;
+            return [];
+        },
     },
     methods: {
-        getAll: function () {
+        getTransactions: function () {
             axios
               .get('/lbcflba/api/all')
-              .then(response => {this.transactions = response.data; this.getGroups(); this.updateSelection();})
+              .then(response => {this.transactions = response.data;})
               .catch(this.printResponseError);
-        },
-        updateSelection: function () {
-            sid = this.selectedGroupId
-            if (sid > -1) {
-                this.members = this.getMembers(sid);
-                this.selectedGroupTransactions = this.transactions
-                    .filter(t => (t.destination == sid))
-                    .filter(this.isSelected);
-            } else {
-                this.members = [];
-                this.selectedGroupTransactions = [];
-            }
-        },
-        isSelected: function(transaction) {
-            if (this.status < 0)
-                return true;
-            return this.status == transaction.status;
         },
         getGroups: function() {
             axios
               .get('/lbcflba/api/groups')
-              .then(this.updateGroups)
+              .then(response => {this.groups = response.data;})
               .catch(this.printResponseError);
-        },
-        updateGroups: function(response) {
-            this.groups = response.data;
-            this.groupDict = {};
-            for (group of this.groups) {
-                this.groupDict[group.id.toString()] = group;
-            }
         },
         getUserInfo: function() {
             axios
               .get('/lbcflba/api/userinfo')
-              .then(response => {this.userInfo = response.data; this.sourceId = this.userInfo.spenderId;})
+              .then(response => {this.userInfo = response.data; this.newData.sourceId = this.userInfo.spenderId;})
               .catch(this.printResponseError);
         },
-        getMembers: function(groupId) {
-            for (group of this.groups)
-                if (group.id == groupId)
-                    return group.members;
-            this.printerr("group not found: " + groupId);
-            return [];
-        },
+
         newTransaction: function () {
             axios.post('/lbcflba/api/new',
-                       {'source': this.sourceId, 'destination': this.selectedGroupId, 'text': this.text, 'amount': this.amount, 'category': this.categoryId},
-                       {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => this.getAll())
+                {
+                   'destination': this.selectedGroupId, 'source': this.newData.sourceId,
+                   'text': this.newData.text,
+                   'amount': this.newData.amount,
+                   'category': this.newData.categoryId
+                },
+                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => this.getTransactions())
             .catch(this.printResponseError)
             .then(() => {
-                this.text = '';
+                this.newData.text = '';
+                this.newData.amount = 0;
                 this.showNewModal = false;
             });
         },
         deleteTransaction: function () {
             axios.post('/lbcflba/api/delete', {'pk': this.pk}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => (this.getAll()))
+            .then(response => (this.getTransactions()))
             .catch(this.printResponseError)
             .then(() => {
                 this.pk = null;
@@ -226,14 +221,21 @@ new Vue({
         },
         newCategory: function (groupId, categoryName) {
             axios.post('/lbcflba/api/group/category/new', {'groupId': groupId, 'categoryName': categoryName}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => this.getAll())
+            .then(response => this.getGroups())
             .catch(this.printResponseError);
         },
         deleteCategory: function (groupId, categoryId) {
             axios.post('/lbcflba/api/group/category/delete', {'groupId': groupId, 'categoryId': categoryId}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-            .then(response => this.getAll())
+            .then(response => this.getGroups())
             .catch(this.printResponseError);
         },
+
+        isSelected: function(transaction) {
+            boolStatus = this.status < 0 || (this.status == transaction.status);
+            boolCategory = this.categoryId < 0 || (this.categoryId == transaction.category);
+            return boolStatus && boolCategory;
+        },
+
         printerr: function (err_msg) {
             alert("prout\n\n" + err_msg);
         },
@@ -243,6 +245,7 @@ new Vue({
     },
     mounted() {
         this.getUserInfo();
-        this.getAll();
+        this.getTransactions();
+        this.getGroups();
     }
 })

@@ -42,7 +42,7 @@
 <div id="app">
     <div class="centering">
         <p>
-            <select v-model="selectedGroupId" @change="updateSelection()">
+            <select v-model="selectedGroupId">
                 <option value="-1">select a group</option>
                 <option v-for="group in groups" :value="group.id">[[ group.name ]]</option>
             </select>
@@ -53,14 +53,14 @@
             <a href="#" class="button" @click="showNewModal = true">new</a>
             <a href="#" class="button" @click="showFilterModal = true">filter</a>
             <a href="#" class="button" @click="showFOptions = true">options</a>
-<!--        <select v-model="status" @change="updateSelection()">-->
-<!--            <option value="-1">all status</option>-->
-<!--            <option v-for="i in [0, 1]" :value="i">[[ i ]]</option>-->
-<!--        </select>-->
-<!--        <select v-model="categoryId" @change="updateSelection()">-->
-<!--            <option value="-1">all cats</option>-->
-<!--            <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>-->
-<!--        </select>-->
+        <select v-model="status">
+            <option value="-1">all status</option>
+            <option v-for="i in [0, 1]" :value="i">[[ i ]]</option>
+        </select>
+        <select v-model="categoryId">
+            <option value="-1">all cats</option>
+            <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
+        </select>
         </p>
     </div>
     <div class="centering" v-if="selectedGroupId > -1" style="min-width:33%">
@@ -81,22 +81,23 @@
     <modal v-if="showNewModal" @close="showNewModal = false">
         <h3 slot="header">new transaction</h3>
         <p slot="body">
-            <select v-model="sourceId">
+            <select v-model="newData.sourceId">
                 <option v-for="member in members" :value="member.spenderId">[[ member.username ]]</option>
             </select>
-            <input type="number" v-model="amount" step=".01">
+            <input type="number" v-model="newData.amount" step=".01">
             <br>
-            <select v-model="categoryId">
+            <select v-model="newData.categoryId">
                 <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
             </select>
             <br>
-            <textarea v-model="text"></textarea>
+            <textarea v-model="newData.text"></textarea>
         </p>
         <span slot="buttons">
           <button @click="newTransaction">
             send
           </button>
       </span>
+    </modal>
 
     </modal>
         <modal v-if="showModifyModal" @close="showModifyModal = false">
@@ -107,16 +108,16 @@
           </button>
       </span>
     </modal>
-        </modal>
-        <modal v-if="showOptionModal" @close="showOptionModal = false">
-        <h3 slot="header">Options</h3>
-        <p slot="body">
-            <input v-model="newCategoryName" placeholder="new category">
-            <button @click="newCategory(selectedGroupId, newCategoryName)">
-            save
-          </button>
-        </p>
-    </modal>
+
+<!--    <modal v-if="showOptionModal" @close="showOptionModal = false">-->
+<!--        <h3 slot="header">Options</h3>-->
+<!--        <p slot="body">-->
+<!--            <input v-model="newCategoryName" placeholder="new category">-->
+<!--            <button @click="newCategory(selectedGroupId, newCategoryName)">-->
+<!--            save-->
+<!--          </button>-->
+<!--        </p>-->
+<!--    </modal>-->
 
 </div>
 <script src="{% static 'lbcflba/app.js' %}"></script>
