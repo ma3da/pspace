@@ -126,12 +126,14 @@ new Vue({
     data: {
         userInfo: {},
         transactions: [],
-        pk: null,
         groups: [],
+
         selectedGroupId: -1,
 
-        status: -1,
-        categoryId: -1,
+        filterData: {
+            statusId: -1,
+            categoryId: -1,
+        },
 
         newData: {
             sourceId: null,
@@ -140,9 +142,17 @@ new Vue({
             categoryId: 0,
         },
 
+        deleteData: {
+            pk: null,
+        },
+
+        optionData: {
+        },
+
         showNewModal: false,
         showModifyModal: false,
-        showOptions: false,
+        showOptionModal: false,
+        showFilterModal: false,
     },
     computed: {
         categoryDict: function() {
@@ -211,29 +221,44 @@ new Vue({
             });
         },
         deleteTransaction: function () {
-            axios.post('/lbcflba/api/delete', {'pk': this.pk}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            axios.post(
+                '/lbcflba/api/delete',
+                {'pk': this.deleteData.pk},
+                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => (this.getTransactions()))
             .catch(this.printResponseError)
             .then(() => {
-                this.pk = null;
+                this.deleteData.pk = null;
                 this.showModifyModal = false;
             });
         },
         newCategory: function (groupId, categoryName) {
-            axios.post('/lbcflba/api/group/category/new', {'groupId': groupId, 'categoryName': categoryName}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            axios.post(
+                '/lbcflba/api/group/category/new',
+                {'groupId': groupId, 'categoryName': categoryName},
+                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getGroups())
             .catch(this.printResponseError);
         },
         deleteCategory: function (groupId, categoryId) {
-            axios.post('/lbcflba/api/group/category/delete', {'groupId': groupId, 'categoryId': categoryId}, {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            axios.post(
+                '/lbcflba/api/group/category/delete',
+                {'groupId': groupId, 'categoryId': categoryId},
+                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getGroups())
             .catch(this.printResponseError);
         },
 
         isSelected: function(transaction) {
-            boolStatus = this.status < 0 || (this.status == transaction.status);
-            boolCategory = this.categoryId < 0 || (this.categoryId == transaction.category);
+            boolStatus = this.filterData.statusId < 0 || (this.filterData.statusId == transaction.status);
+            boolCategory = this.filterData.categoryId < 0 || (this.filterData.categoryId == transaction.category);
             return boolStatus && boolCategory;
+        },
+        clearFilters: function() {
+            this.filterData = {
+                statusId: -1,
+                categoryId: -1,
+            };
         },
 
         printerr: function (err_msg) {

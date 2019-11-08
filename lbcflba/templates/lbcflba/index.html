@@ -12,7 +12,6 @@
         <div class="modal-mask" @click="close">
             <div class="modal-wrapper">
                 <div class="modal-container" @click.stop>
-
                     <div class="modal-header">
                         <slot name="header">
                             default header
@@ -28,7 +27,7 @@
 
                         </slot>
                         <button class="modal-default-button" @click="close">
-                            cancel
+                            out
                         </button>
                     </div>
                 </div>
@@ -53,14 +52,6 @@
             <a href="#" class="button" @click="showNewModal = true">new</a>
             <a href="#" class="button" @click="showFilterModal = true">filter</a>
             <a href="#" class="button" @click="showFOptions = true">options</a>
-        <select v-model="status">
-            <option value="-1">all status</option>
-            <option v-for="i in [0, 1]" :value="i">[[ i ]]</option>
-        </select>
-        <select v-model="categoryId">
-            <option value="-1">all cats</option>
-            <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
-        </select>
         </p>
     </div>
     <div class="centering" v-if="selectedGroupId > -1" style="min-width:33%">
@@ -74,7 +65,7 @@
                :userinfo="userInfo"
                :members="members"
                :categorydict="categoryDict"
-               @showmodify="showModifyModal = true; pk = $event">
+               @showmodify="showModifyModal = true; deleteData.pk = $event">
         </daily>
     </div>
 
@@ -109,15 +100,33 @@
       </span>
     </modal>
 
-<!--    <modal v-if="showOptionModal" @close="showOptionModal = false">-->
-<!--        <h3 slot="header">Options</h3>-->
-<!--        <p slot="body">-->
-<!--            <input v-model="newCategoryName" placeholder="new category">-->
-<!--            <button @click="newCategory(selectedGroupId, newCategoryName)">-->
-<!--            save-->
-<!--          </button>-->
-<!--        </p>-->
-<!--    </modal>-->
+    <modal v-if="showOptionModal" @close="showOptionModal = false">
+        <h3 slot="header">Options</h3>
+        <p slot="body">
+            <input v-model="newCategoryName" placeholder="new category">
+            <button @click="newCategory(selectedGroupId, newCategoryName)">
+            save
+          </button>
+        </p>
+    </modal>
+
+    <modal v-if="showFilterModal" @close="showFilterModal = false">
+        <h3 slot="header">Options</h3>
+        <p slot="body">
+            <select v-model="filterData.statusId">
+                <option value="-1">all status</option>
+                <option v-for="i in [0, 1]" :value="i">[[ i ]]</option>
+            </select>
+            <br>
+            <select v-model="filterData.categoryId">
+                <option value="-1">all cats</option>
+                <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
+            </select>
+        </p>
+        <span slot="buttons">
+            <button @click="clearFilters">clear</button>
+        </span>
+    </modal>
 
 </div>
 <script src="{% static 'lbcflba/app.js' %}"></script>
