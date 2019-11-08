@@ -186,6 +186,10 @@ input[type=text], input[type=password] {
   float: right;
 }
 
+.modal-footer {
+    overflow: auto;
+}
+
 /*
  * The following styles are auto-applied to elements with
  * transition="modal" when their visibility is toggled
@@ -232,6 +236,13 @@ input[type=text], input[type=password] {
     overflow:auto;
     width:96vw;
     padding-bottom:50vh;
+}
+
+.lbcflba-menu {
+    color: #42b983;
+    font-size: 2em;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 #menu {

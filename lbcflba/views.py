@@ -120,7 +120,6 @@ class GroupList(APIView):
                 group["name"] = ", ".join(spender["username"] for spender in group["members"])
             # categoryDict inflation
             for group in serializer.data:
-                print(group["categoryDict"])
                 group["categoryDict"] = to_dict(group["categoryDict"])
                 group["categoryDict"].update({0: "uncategorized"})
             return Response(serializer.data)

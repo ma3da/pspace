@@ -16,14 +16,6 @@ Vue.component('modal', {
 
 Vue.component('daily', {
     methods: {
-        getMemberName: function(mId, members) {
-            for (member of members) {
-                if (member.spenderId == mId) {
-                    return member.username;
-                }
-            }
-            return "???"
-        },
         getTimeStr(transaction) {
             return moment(transaction.time).format('DD MMM[.] H[h]mm')
         },
@@ -39,7 +31,7 @@ Vue.component('daily', {
             return "Gray";
         },
     },
-    props: ["transaction", "userinfo", "members", "categorydict"],
+    props: ["transaction", "userinfo", "memberdict", "categorydict"],
     template: `
     <table class="transaction_table" :style="{border: '2px solid ' + getStatusColor(transaction.status), color: 'Gray'}">
         <tr>
@@ -49,7 +41,7 @@ Vue.component('daily', {
         </tr>
         <tr></tr>
         <tr>
-            <td :style="{'font-size': '0.8em', 'vertical-align': 'bottom', 'padding-bottom':'0'}"> {{ getMemberName(transaction.source, members) }}, {{ getTimeStr(transaction) }}, {{ categorydict[transaction.category] }} </td>
+            <td :style="{'font-size': '0.8em', 'vertical-align': 'bottom', 'padding-bottom':'0'}"> {{ memberdict[transaction.source].username }}, {{ getTimeStr(transaction) }}, {{ categorydict[transaction.category] }} </td>
         </tr>
     </table>
     `
@@ -62,25 +54,17 @@ Vue.component('recap', {
         }
     },
     methods: {
-        getMemberName: function(mId, members) {
-            for (member of members) {
-                if (member.spenderId == mId) {
-                    return member.username;
-                }
-            }
-            return "???"
-        },
-        computeShares(transactions, members) {
+        computeShares(transactions, memberdict) {
             shares = {};
-            for (member of members) {
-                shares[member.spenderId] = 0
+            for (id in memberdict) {
+                shares[id] = 0
             }
             total = 0;
             for (t of transactions) {
                 shares[t.source] += parseFloat(t.amount);
                 total += parseFloat(t.amount);
             }
-            mean = total / members.length;
+            mean = total / Object.keys(memberdict).length;
             for (id in shares) {
                 shares[id] -= mean;
                 shares[id] = shares[id].toFixed(2);
@@ -99,21 +83,21 @@ Vue.component('recap', {
         },
         getArrow(amount) {
             if (amount > 0) {
-                symbol =  "<=";
+                symbol =  "<i class='fa fa-long-arrow-left'></i>";
             } else if (amount < 0) {
-                symbol =  "=>";
+                symbol =  "<i class='fa fa-long-arrow-right'></i>";
             } else {
                 symbol = "==";
             }
             return symbol;
         }
     },
-    props: ["transactions", "userinfo", "members"],
+    props: ["transactions", "userinfo", "memberdict"],
     template: `
     <table class="recap_table" style="border: 1px solid #eeeeee">
-        <tr v-for="(amount, id) in computeShares(transactions, members)">
-            <td> {{ getMemberName(id, members) }} </td>
-            <td> {{ getArrow(parseFloat(amount)) }} </td>
+        <tr v-for="(amount, id) in computeShares(transactions, memberdict)">
+            <td> {{ memberdict[id].username }} </td>
+            <td> <span v-html="getArrow(parseFloat(amount))"></span> </td>
             <td :style="getSumStyle(amount)"> {{ amount }} </td>
         </tr>
     </table>
@@ -147,24 +131,44 @@ new Vue({
         },
 
         optionData: {
+            categoryName: '',
+            categoryId: 0,
         },
 
         showNewModal: false,
         showModifyModal: false,
         showOptionModal: false,
         showFilterModal: false,
+        showChooseModal: false,
     },
     computed: {
+        groupDict: function() {
+            var d = {};
+            for (group of this.groups) {
+                d[group.id] = group;
+            }
+            return d;
+        },
         categoryDict: function() {
             sid = this.selectedGroupId;
-                if (sid > -1)
-                    return this.groupDict[this.selectedGroupId].categoryDict;
+            console.log(sid)
+            console.log(this.groups)
+            console.log(this.groupDict)
+                if (sid > -1){
+                    return this.groupDict[sid].categoryDict;
+                }
                 return {};
         },
-        groupDict: function() {
-            d = {};
-            for (group of this.groups) {
-                d[group.id.toString()] = group;
+        members: function() {
+            sid = this.selectedGroupId
+            if (sid > -1);
+                return this.groupDict[sid].members;
+            return [];
+        },
+        memberDict: function() {
+            var d = {};
+            for (member of this.members) {
+                d[member.spenderId.toString()] = member;
             }
             return d;
         },
@@ -174,12 +178,6 @@ new Vue({
                 return this.transactions
                   .filter(t => (t.destination == sid))
                   .filter(this.isSelected);
-            return [];
-        },
-        members: function() {
-            sid = this.selectedGroupId
-            if (sid > -1);
-                return this.groupDict[sid].members;
             return [];
         },
     },
@@ -232,21 +230,27 @@ new Vue({
                 this.showModifyModal = false;
             });
         },
-        newCategory: function (groupId, categoryName) {
+        newCategory: function () {
             axios.post(
                 '/lbcflba/api/group/category/new',
-                {'groupId': groupId, 'categoryName': categoryName},
+                {'groupId': this.selectedGroupId, 'categoryName': this.optionData.categoryName},
                 {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getGroups())
-            .catch(this.printResponseError);
+            .catch(this.printResponseError)
+            .then(() => {
+                this.optionData.categoryName = '';
+            });
         },
         deleteCategory: function (groupId, categoryId) {
             axios.post(
                 '/lbcflba/api/group/category/delete',
-                {'groupId': groupId, 'categoryId': categoryId},
+                {'groupId': this.selectedGroupId, 'categoryId': this.optionData.categoryId},
                 {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getGroups())
-            .catch(this.printResponseError);
+            .catch(this.printResponseError)
+                        .then(() => {
+                this.optionData.categoryId = 0;
+            });
         },
 
         isSelected: function(transaction) {
@@ -272,5 +276,6 @@ new Vue({
         this.getUserInfo();
         this.getTransactions();
         this.getGroups();
+        this.groupDict;
     }
 })
