@@ -1,26 +1,21 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pspace</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block head %}
+    <title>pspace</title>
+{% endblock %}
+
+{% block content %}
 <div class="vh-centering-container">
     <div class="vh-centering">
-        <a class="button" href="{% url 'definition:index' %}">definition</a>
-        <br>
-        <br>
-        <a class="button" href="{% url 'timetable:index' %}">agenda</a>
-        <br>
-        <br>
-        <a class="button" href="{% url 'lbcflba:index' %}">lbcflba</a>
-        <br>
-        <br>
-        <a class="button" href="{% url 'logout' %}">logout</a>
+        <p>
+            <a class="button" href="{% url 'definition:index' %}">definition</a>
+            <br>
+            <br>
+            <a class="button" href="{% url 'timetable:index' %}">agenda</a>
+            <br>
+            <br>
+            <a class="button" href="{% url 'lbcflba:index' %}">lbcflba</a>
+        </p>
     </div>
 </div>
-</body>
-</html>
+{% endblock %}

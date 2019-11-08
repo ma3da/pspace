@@ -233,3 +233,18 @@ input[type=text], input[type=password] {
     width:96vw;
     padding-bottom:50vh;
 }
+
+#menu {
+    border-bottom: 2px solid #42b983;
+    text-align: right;
+}
+
+#menu a {
+    color: #42b983;
+    font-size: 2em;
+    margin-right:1vw;
+}
+
+#content {
+
+}
