@@ -20,11 +20,7 @@ Vue.component('daily', {
             return moment(transaction.time).format('DD MMM[.] H[h]mm')
         },
         getAmountStyle(transaction, spenderId) {
-            if (transaction.source == spenderId) {
-                color = "Tomato";
-            } else {
-                color =  "CornFlowerBlue";
-            }
+            var color = transaction.source == spenderId ? "Tomato" : "CornFlowerBlue";
             return {color: color, background: "white", width: "10%", "font-size": "1.2em"};
         },
         getStatusColor(status) {
@@ -55,16 +51,16 @@ Vue.component('recap', {
     },
     methods: {
         computeShares(transactions, memberdict) {
-            shares = {};
+            var shares = {};
             for (id in memberdict) {
                 shares[id] = 0
             }
-            total = 0;
+            var total = 0;
             for (t of transactions) {
                 shares[t.source] += parseFloat(t.amount);
                 total += parseFloat(t.amount);
             }
-            mean = total / Object.keys(memberdict).length;
+            var mean = total / Object.keys(memberdict).length;
             for (id in shares) {
                 shares[id] -= mean;
                 shares[id] = shares[id].toFixed(2);
@@ -150,7 +146,7 @@ new Vue({
             return d;
         },
         categoryDict: function() {
-            sid = this.selectedGroupId;
+            var sid = this.selectedGroupId;
             console.log(sid)
             console.log(this.groups)
             console.log(this.groupDict)
@@ -173,7 +169,7 @@ new Vue({
             return d;
         },
         selectedGroupTransactions: function() {
-            sid = this.selectedGroupId;
+            var sid = this.selectedGroupId;
             if (sid > -1)
                 return this.transactions
                   .filter(t => (t.destination == sid))
@@ -254,8 +250,8 @@ new Vue({
         },
 
         isSelected: function(transaction) {
-            boolStatus = this.filterData.statusId < 0 || (this.filterData.statusId == transaction.status);
-            boolCategory = this.filterData.categoryId < 0 || (this.filterData.categoryId == transaction.category);
+            var boolStatus = this.filterData.statusId < 0 || (this.filterData.statusId == transaction.status);
+            var boolCategory = this.filterData.categoryId < 0 || (this.filterData.categoryId == transaction.category);
             return boolStatus && boolCategory;
         },
         clearFilters: function() {
