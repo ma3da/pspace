@@ -60,7 +60,7 @@
                :userinfo="userInfo"
                :memberdict="memberDict"
                :categorydict="categoryDict"
-               @showmodify="showModifyModal = true; deleteData.pk = $event">
+               @showmodify="doShowUpdateModal">
         </daily>
     </div>
 
@@ -86,12 +86,22 @@
     </modal>
 
     </modal>
-        <modal v-if="showModifyModal" @close="showModifyModal = false">
+        <modal v-if="showUpdateModal" @close="showUpdateModal = false">
         <h3 slot="header">Update task</h3>
+        <p slot="body">
+            <input type="date">
+            <br>
+            <textarea v-model="updateData.text"></textarea>
+            <br>
+            <select v-model="updateData.categoryId">
+                <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
+            </select>
+            <br>
+            <br>
+            <button @click="deleteTransaction">delete transaction</button>
+        </p>
         <span slot="buttons">
-          <button @click="deleteTransaction">
-            delete
-          </button>
+            <button @click="updateTransaction">save</button>
       </span>
     </modal>
 

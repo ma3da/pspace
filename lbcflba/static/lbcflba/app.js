@@ -29,11 +29,11 @@ Vue.component('daily', {
     },
     props: ["transaction", "userinfo", "memberdict", "categorydict"],
     template: `
-    <table class="transaction_table" :style="{border: '2px solid ' + getStatusColor(transaction.status), color: 'Gray'}">
+    <table class="transaction_table" :style="{border: '2px solid ' + getStatusColor(transaction.status), color: 'Gray'}" @click="$emit('showmodify', transaction.id)">
         <tr>
             <td rowspan="3" v-bind:style="getAmountStyle(transaction, userinfo.spenderId)"> {{ transaction.amount }} </td>
             <td rowspan="2" colspan="2" style="min-width: 80%"> {{ transaction.text }} </td>
-            <td rowspan="3" :style="{width: '5%', background: getStatusColor(transaction.status), color: '#eeeeee'}" @click="$emit('showmodify', transaction.id)"> {{ transaction.status }} </td>
+            <td rowspan="3" :style="{width: '5%', background: getStatusColor(transaction.status), color: '#eeeeee'}"> {{ transaction.status }} </td>
         </tr>
         <tr></tr>
         <tr>
@@ -122,8 +122,10 @@ new Vue({
             categoryId: 0,
         },
 
-        deleteData: {
+        updateData: {
             pk: null,
+            text: '',
+            categoryId: 0,
         },
 
         optionData: {
@@ -132,7 +134,7 @@ new Vue({
         },
 
         showNewModal: false,
-        showModifyModal: false,
+        showUpdateModal: false,
         showOptionModal: false,
         showFilterModal: false,
         showChooseModal: false,
@@ -176,6 +178,13 @@ new Vue({
                   .filter(this.isSelected);
             return [];
         },
+        transactionDict: function() {
+            var d = {};
+            for (transaction of this.transactions) {
+                d[transaction.id] = transaction;
+            }
+            return d;
+        },
     },
     methods: {
         getTransactions: function () {
@@ -217,14 +226,27 @@ new Vue({
         deleteTransaction: function () {
             axios.post(
                 '/lbcflba/api/delete',
-                {'pk': this.deleteData.pk},
+                {'pk': this.updateData.pk},
                 {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => (this.getTransactions()))
             .catch(this.printResponseError)
             .then(() => {
-                this.deleteData.pk = null;
-                this.showModifyModal = false;
+                this.clearUpdateData();
+                this.showUpdateModal = false;
             });
+        },
+        updateTransaction: function () {
+//            axios.post(
+//                '/lbcflba/api/update',
+//                {'pk': this.updateData.pk, 'text': this.updateData.text, 'categoryId': this.updateData.categoryId},
+//                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+//            .then(response => (this.getTransactions()))
+//            .catch(this.printResponseError)
+//            .then(() => {
+//                this.clearUpdateData();
+//                this.showUpdateModal = false;
+//            });
+            alert("update sent: " + JSON.stringify({'pk': this.updateData.pk, 'text': this.updateData.text, 'categoryId': this.updateData.categoryId}));
         },
         newCategory: function () {
             axios.post(
@@ -259,6 +281,20 @@ new Vue({
                 statusId: -1,
                 categoryId: -1,
             };
+        },
+        setUpdateDataTo: function(transaction) {
+            this.updateData.pk = transaction.id;
+            this.updateData.text = transaction.text;
+            this.updateData.categoryId = transaction.category;
+        },
+        clearUpdateData: function() {
+            this.updateData.pk = null;
+            this.updateData.text = "";
+            this.updateData.categoryId = 0;
+        },
+        doShowUpdateModal: function(transationId) {
+            this.setUpdateDataTo(this.transactionDict[transationId]);
+            this.showUpdateModal = true;
         },
 
         printerr: function (err_msg) {
