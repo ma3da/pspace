@@ -78,12 +78,31 @@ class TransactionList(APIView):
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# todo: restrict access on pk
 class TransactionDelete(APIView):
     def post(self, request, format=None):
         try:
             pk = request.data["pk"]
 
             Transaction.objects.get(pk=pk).delete()
+            return Response()
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# todo: restrict access on pk
+class TransactionUpdate(APIView):
+    def post(self, request, format=None):
+        try:
+            pk = request.data["pk"]
+            args = {"text": str(request.data["text"]),
+                    "category": int(request.data["categoryId"])}
+            try:
+                args["date"] = datetime.datetime.strptime(str(request.data["date"]), "%Y-%m-%d").date()
+            except ValueError or AttributeError as e:
+                pass
+
+            Transaction.objects.filter(pk=pk).update(**args)
             return Response()
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

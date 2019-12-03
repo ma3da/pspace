@@ -1,3 +1,4 @@
+import datetime
 import enum
 import json
 
@@ -46,7 +47,8 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=14, decimal_places=2)
     text = models.TextField()
     category = models.PositiveSmallIntegerField(default=0)
-    time = models.DateTimeField()
+    time = models.DateTimeField()  # creation_time, immutable
+    date = models.DateField(default=datetime.date.today)  # mutable
     status = models.PositiveSmallIntegerField()
 
 

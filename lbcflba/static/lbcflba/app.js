@@ -17,7 +17,7 @@ Vue.component('modal', {
 Vue.component('daily', {
     methods: {
         getTimeStr(transaction) {
-            return moment(transaction.time).format('DD MMM[.] H[h]mm')
+            return moment(transaction.date).format('DD MMM')
         },
         getAmountStyle(transaction, spenderId) {
             var color = transaction.source == spenderId ? "Tomato" : "CornFlowerBlue";
@@ -126,6 +126,7 @@ new Vue({
             pk: null,
             text: '',
             categoryId: 0,
+            date: null,
         },
 
         optionData: {
@@ -236,17 +237,21 @@ new Vue({
             });
         },
         updateTransaction: function () {
-//            axios.post(
-//                '/lbcflba/api/update',
-//                {'pk': this.updateData.pk, 'text': this.updateData.text, 'categoryId': this.updateData.categoryId},
-//                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-//            .then(response => (this.getTransactions()))
-//            .catch(this.printResponseError)
-//            .then(() => {
-//                this.clearUpdateData();
-//                this.showUpdateModal = false;
-//            });
-            alert("update sent: " + JSON.stringify({'pk': this.updateData.pk, 'text': this.updateData.text, 'categoryId': this.updateData.categoryId}));
+            axios.post(
+                '/lbcflba/api/update',
+                {
+                    'pk': this.updateData.pk,
+                    'text': this.updateData.text,
+                    'categoryId': this.updateData.categoryId,
+                    'date': this.updateData.date
+                },
+                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => (this.getTransactions()))
+            .catch(this.printResponseError)
+            .then(() => {
+                this.clearUpdateData();
+                this.showUpdateModal = false;
+            });
         },
         newCategory: function () {
             axios.post(
@@ -286,11 +291,13 @@ new Vue({
             this.updateData.pk = transaction.id;
             this.updateData.text = transaction.text;
             this.updateData.categoryId = transaction.category;
+            this.updateData.date = transaction.date;
         },
         clearUpdateData: function() {
             this.updateData.pk = null;
             this.updateData.text = "";
             this.updateData.categoryId = 0;
+            this.updateData.date = null;
         },
         doShowUpdateModal: function(transationId) {
             this.setUpdateDataTo(this.transactionDict[transationId]);
