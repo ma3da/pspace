@@ -239,10 +239,16 @@ input[type=text], input[type=password] {
 }
 
 .lbcflba-menu {
+    display:flex;
+    justify-content:space-around;
+    margin: auto;
+    max-width: 32em;
+    margin-bottom: 1em;
+}
+
+.lbcflba-menu-icon {
     color: #42b983;
     font-size: 2em;
-    padding-left: 1em;
-    padding-right: 1em;
 }
 
 #menu {

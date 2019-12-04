@@ -29,7 +29,7 @@ Vue.component('daily', {
     },
     props: ["transaction", "userinfo", "memberdict", "categorydict"],
     template: `
-    <table class="transaction_table" :style="{border: '2px solid ' + getStatusColor(transaction.status), color: 'Gray'}" @click="$emit('showmodify', transaction.id)">
+    <table class="transaction_table" :style="{border: '2px solid ' + getStatusColor(transaction.status), color: 'Gray'}" @click="$emit('showupdate', transaction.id)">
         <tr>
             <td rowspan="3" v-bind:style="getAmountStyle(transaction, userinfo.spenderId)"> {{ transaction.amount }} </td>
             <td rowspan="2" colspan="2" style="min-width: 80%"> {{ transaction.text }} </td>
