@@ -183,11 +183,13 @@ input[type=text], input[type=password] {
 }
 
 .modal-default-button {
-  float: right;
+  float: left;
 }
 
 .modal-footer {
-    overflow: auto;
+    display: flex;
+    justify-content: space-around;
+    margin: auto;
 }
 
 /*

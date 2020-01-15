@@ -221,11 +221,9 @@ new Vue({
             .then(response => this.getTransactions())
             .catch(this.printResponseError)
             .then(() => {
-                this.newData.text = '';
-                this.newData.amount = 0;
-                this.showNewModal = false;
-                this.showFastNewModal = false;
-                this.newData.fastState = 0;
+                this.clearNewData();
+                this.showNewModal = false;      // wrong place
+                this.showFastNewModal = false;  //
             });
         },
         deleteTransaction: function () {
@@ -237,7 +235,7 @@ new Vue({
             .catch(this.printResponseError)
             .then(() => {
                 this.clearUpdateData();
-                this.showUpdateModal = false;
+                this.showUpdateModal = false;   // wrong place
             });
         },
         updateTransaction: function () {
@@ -294,7 +292,6 @@ new Vue({
             }
             else if (actualState == 3) {
                 this.newTransaction();
-                this.
                 return;
             }
 
@@ -311,6 +308,13 @@ new Vue({
                 statusId: -1,
                 categoryId: -1,
             };
+        },
+        clearNewData: function() {
+            this.newData.sourceId = null;
+            this.newData.text = '';
+            this.newData.amount = 0;
+            this.newData.categoryId = 0;
+            this.newData.fastState = 0;
         },
         setUpdateDataTo: function(transaction) {
             this.updateData.pk = transaction.id;
