@@ -41,7 +41,7 @@
 <div id="app">
     <div class="lbcflba-menu">
             <a href="#" class="lbcflba-menu-icon" @click="showChooseModal = true"><i class="fa fa-bars"></i></a>
-            <a href="#" v-if="selectedGroupId > -1" class="lbcflba-menu-icon" @click="showNewModal = true"><i class="fa fa-plus"></i></a>
+            <a href="#" v-if="selectedGroupId > -1" class="lbcflba-menu-icon" @click="showFastNewModal = true"><i class="fa fa-plus"></i></a>
             <a href="#" v-if="selectedGroupId > -1" class="lbcflba-menu-icon" @click="showFilterModal = true"><i class="fa fa-filter"></i></a>
             <a href="#" v-if="selectedGroupId > -1" class="lbcflba-menu-icon" @click="showOptionModal = true"><i class="fa fa-cog"></i></a>
     </div>
@@ -142,6 +142,35 @@
             <li v-for="group in groups" @click="selectedGroupId = group.id; showChooseModal = false;"><a href="#">[[ group.name ]]</a></li>
         </ul>
     </modal>
+
+        </modal>
+        <modal v-if="showFastNewModal" @close="showFastNewModal = false">
+        <h3 slot="header">new transaction</h3>
+        <div slot="body">
+            <ul v-if="newData.fastState == 0">
+                <li v-for="member in members">
+                    <button @click="processFastState(0, member.spenderId) ">[[member.username]] paid</button><br>
+                </li>
+            </ul>
+            <ul v-if="newData.fastState == 1">
+                <li><button @click="processFastState(1, -1) ">to [[member.username]]</button><br></li>
+                <li v-for="member in members">
+                    <button @click="processFastState(1, member.spenderId) ">to [[member.username]]</button><br>
+                </li>
+            </ul>
+            <div v-if="newData.fastState == 2">
+                <input type="number" v-model="newData.amount" step=".01">
+                <button @click="processFastState(2, null) "><i class="fa fa-arrow-right"></i></button>
+            </div>
+            <div v-if="newData.fastState == 3">
+                <select v-model="newData.categoryId">
+                    <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
+                </select>
+                <button @click="processFastState(3, null) "><i class="fa fa-check"></i></button>
+            </div>
+        </div>
+    </modal>
+
 </div>
 <script src="{% static 'lbcflba/app.js' %}"></script>
 {% endblock %}

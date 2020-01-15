@@ -120,6 +120,7 @@ new Vue({
             text: '',
             amount: 0,
             categoryId: 0,
+            fastState: 0,
         },
 
         updateData: {
@@ -135,6 +136,7 @@ new Vue({
         },
 
         showNewModal: false,
+        showFastNewModal: false,
         showUpdateModal: false,
         showOptionModal: false,
         showFilterModal: false,
@@ -222,6 +224,8 @@ new Vue({
                 this.newData.text = '';
                 this.newData.amount = 0;
                 this.showNewModal = false;
+                this.showFastNewModal = false;
+                this.newData.fastState = 0;
             });
         },
         deleteTransaction: function () {
@@ -274,6 +278,27 @@ new Vue({
                         .then(() => {
                 this.optionData.categoryId = 0;
             });
+        },
+
+        processFastState: function(actualState, data) {
+            if (actualState == 0) {
+                spenderId = data;
+                this.newData.sourceId = spenderId;
+                this.newData.fastState += 1; // skip next, for now
+            }
+            else if (actualState == 1) {
+//                spenderId = data;
+//                this.newData.destination = spenderId;
+            }
+            else if (actualState == 2) {
+            }
+            else if (actualState == 3) {
+                this.newTransaction();
+                this.
+                return;
+            }
+
+            this.newData.fastState += 1;
         },
 
         isSelected: function(transaction) {
