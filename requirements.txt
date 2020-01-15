@@ -1,7 +1,7 @@
 beautifulsoup4==4.7.1
 certifi==2018.11.29
 chardet==3.0.4
-Django==2.1.11
+Django==2.1.15
 djangorestframework==3.9.1
 gunicorn==19.9.0
 idna==2.8
