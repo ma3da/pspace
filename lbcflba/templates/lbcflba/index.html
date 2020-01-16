@@ -81,11 +81,7 @@
             <br>
             <textarea v-model="newData.text"></textarea>
         </p>
-        <span slot="buttons">
-          <button @click="newTransaction">
-            send
-          </button>
-      </span>
+        <button slot="button-right" @click="newTransaction">send</button>
     </modal>
 
     </modal>
@@ -103,9 +99,7 @@
             <br>
             <button @click="deleteTransaction">delete transaction</button>
         </p>
-        <span slot="buttons">
-            <button @click="updateTransaction">save</button>
-      </span>
+        <button slot="button-right" @click="updateTransaction">save</button>
     </modal>
 
     <modal v-if="showOptionModal" @close="showOptionModal = false">
@@ -137,9 +131,8 @@
                 <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
             </select>
         </p>
-        <span slot="buttons">
-            <button @click="clearFilters">clear</button>
-        </span>
+        <button slot="button-middle" @click="clearFilters">clear</button>
+        <button slot="button-right" @click="showFilterModal = false"><i class="fa fa-check"></i></button>
     </modal>
 
         <modal v-if="showFastNewModal" @close="showFastNewModal = false">

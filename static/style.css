@@ -188,7 +188,7 @@ input[type=text], input[type=password] {
 
 .modal-footer {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     margin: auto;
 }
 
