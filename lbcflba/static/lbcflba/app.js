@@ -118,7 +118,7 @@ new Vue({
         newData: {
             sourceId: null,
             text: '',
-            amount: 0,
+            amount: null,
             categoryId: 0,
             fastState: 0,
         },
@@ -296,6 +296,10 @@ new Vue({
             }
 
             this.newData.fastState += 1;
+        },
+        closeFastNewModal: function() {
+            this.showFastNewModal = false;
+            this.clearNewData();
         },
 
         isSelected: function(transaction) {

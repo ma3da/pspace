@@ -135,7 +135,7 @@
         <button slot="button-right" @click="showFilterModal = false"><i class="fa fa-check"></i></button>
     </modal>
 
-        <modal v-if="showFastNewModal" @close="showFastNewModal = false">
+    <modal v-if="showFastNewModal" @close="closeFastNewModal">
         <h3 slot="header">new transaction</h3>
         <div slot="body">
             <div v-if="newData.fastState == 0">
