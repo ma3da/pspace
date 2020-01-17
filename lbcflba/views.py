@@ -17,11 +17,11 @@ def get_main_user(request):
 
 
 def _user2json(user):
-    return {"spenderId": user.spender.id, "username": user.username}
+    return {"spenderId": user.spender.id, "username": user.spender.name}
 
 
 def _spender2json(spender):
-    return {"spenderId": spender.id, "username": spender.user.username}
+    return {"spenderId": spender.id, "username": spender.name}
 
 
 def allowed_groups(user):
@@ -48,6 +48,16 @@ class UserInfo(APIView):
     def get(self, request, format=None):
         try:
             return Response(_user2json(get_main_user(request)))
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, format=None):
+        try:
+            if "username" in request.data:
+                spender = Spender.objects.get(id=get_main_user(request).spender.id)
+                spender.rename(request.data["username"])
+                spender.save()
+            return Response(status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -136,7 +146,6 @@ class GroupList(APIView):
             spender_by_id = {member.id: member for member in spenders}
             for group in serializer.data:
                 group["members"] = [_spender2json(spender_by_id[member_id]) for member_id in to_list(group["members"])]
-                # group["name"] = ", ".join(spender["username"] for spender in group["members"])
             # categoryDict inflation
             for group in serializer.data:
                 group["categoryDict"] = to_dict(group["categoryDict"])

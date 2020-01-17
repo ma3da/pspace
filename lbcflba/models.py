@@ -19,7 +19,11 @@ class Status(enum.Enum):
 
 class Spender(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.TextField(default="noname")
     groups = models.TextField()
+
+    def rename(self, new_name):
+        self.name = new_name
 
 
 class Group(models.Model):

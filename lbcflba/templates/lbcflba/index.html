@@ -48,6 +48,10 @@
     </div>
     <div class="centering" v-if="selectedGroupId == -1" style="min-width:33%">
         <div class="centering" v-for="group in groups">
+            <p>
+            I am <input v-model="userData.name" :placeholder="userInfo.username"> 
+            <button @click="renameUser"><i class="fa fa-check"></i></button>
+            </p>
             <br>
             <a class="button" href="#" @click="selectedGroupId = group.id; showChooseModal = false;">[[ group.name ]]</a><br>
         </div>

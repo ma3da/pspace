@@ -115,6 +115,10 @@ new Vue({
             categoryId: -1,
         },
 
+        userData: {
+            name: "",
+        },
+
         newData: {
             sourceId: null,
             text: '',
@@ -286,6 +290,19 @@ new Vue({
             .then(() => {
                 this.optionData.groupName = "";
             });
+        },
+        renameUser: function() {
+            axios.post('/lbcflba/api/userinfo',
+                {'username': this.userData.name},
+                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => this.getUserInfo())
+            .catch(this.printResponseError)
+            .then(() => {
+                this.userData.name = "";
+                this.getUserInfo();
+                this.getGroups();
+            });
+            
         },
 
         processFastState: function(actualState, data) {
