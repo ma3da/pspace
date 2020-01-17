@@ -136,7 +136,7 @@ class GroupList(APIView):
             spender_by_id = {member.id: member for member in spenders}
             for group in serializer.data:
                 group["members"] = [_spender2json(spender_by_id[member_id]) for member_id in to_list(group["members"])]
-                group["name"] = ", ".join(spender["username"] for spender in group["members"])
+                # group["name"] = ", ".join(spender["username"] for spender in group["members"])
             # categoryDict inflation
             for group in serializer.data:
                 group["categoryDict"] = to_dict(group["categoryDict"])
@@ -156,6 +156,22 @@ class GroupList(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GroupUpdate(APIView):
+    def post(self, request, format=None):
+        try:
+            group_id = int(request.data["groupId"])
+            if group_id not in allowed_groups(get_main_user(request)):
+                raise PermissionError("Nope")
+            group = Group.objects.get(id=group_id)
+            new_values = request.data
+            if "name" in new_values:
+                group.rename(new_values["name"])
+                group.save()
+            return Response(status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

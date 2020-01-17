@@ -273,8 +273,18 @@ new Vue({
                 {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getGroups())
             .catch(this.printResponseError)
-                        .then(() => {
+            .then(() => {
                 this.optionData.categoryId = 0;
+            });
+        },
+        renameGroup: function() {
+            axios.post('/lbcflba/api/group/update',
+                {'groupId': this.selectedGroupId, 'name': this.optionData.groupName},
+                {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
+            .then(response => this.getGroups())
+            .catch(this.printResponseError)
+            .then(() => {
+                this.optionData.groupName = "";
             });
         },
 

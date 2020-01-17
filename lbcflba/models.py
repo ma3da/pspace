@@ -25,6 +25,7 @@ class Spender(models.Model):
 class Group(models.Model):
     members = models.TextField()
     categoryDict = models.TextField(default="{}")
+    name = models.TextField(default="unnamed group")
 
     def add_category(self, category_name):
         categories = to_dict(self.categoryDict)
@@ -37,6 +38,9 @@ class Group(models.Model):
         if category_id in categories:
             categories.pop(category_id)
         self.categoryDict = to_entry_from_dict(categories)
+
+    def rename(self, new_name):
+        self.name = new_name
 
 
 class Transaction(models.Model):

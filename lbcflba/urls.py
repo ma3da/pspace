@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/update', login_required(views.TransactionUpdate.as_view()), name='update'),
     path('api/contacts/all', login_required(views.ContactList.as_view()), name='contact_list'),
     path('api/groups', login_required(views.GroupList.as_view()), name='groups'),
+    path('api/group/update', login_required(views.GroupUpdate.as_view()), name='group_update'),
     path('api/group/category/new', login_required(views.GroupCategory.as_view()), name='group_category'),
     path('api/group/category/delete', login_required(views.GroupCategoryDelete.as_view()), name='group_category_del'),
     path('api/members/<int:group_id>', login_required(views.MemberList.as_view()), name='members'),

@@ -115,6 +115,11 @@
                 </select>
                 <button @click="deleteCategory">delete</button>
             </p>
+            <h2>Group Name</h2>
+            <p>
+                <input v-model="optionData.groupName" :placeholder="[[groupDict[selectedGroupId].name]]">
+                <button @click="renameGroup">rename</button>
+            </p>
         </div>
     </modal>
 
