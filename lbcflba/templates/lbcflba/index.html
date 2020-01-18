@@ -149,16 +149,15 @@
         <div slot="body">
             <div v-if="newData.fastState == 0">
                 <div v-for="member in members">
-                    <button @click="processFastState(0, member.spenderId) ">[[member.username]] paid</button><br>
-                    <br>
+                    <p><button @click="processFastState(0, member.spenderId) ">[[member.username]] paid</button></p>
                 </div>
             </div>
-            <ul v-if="newData.fastState == 1">
-                <li><button @click="processFastState(1, -1) ">to [[member.username]]</button><br></li>
-                <li v-for="member in members">
-                    <button @click="processFastState(1, member.spenderId) ">to [[member.username]]</button><br>
-                </li>
-            </ul>
+            <div v-if="newData.fastState == 1">
+                <div><p><button @click="processFastState(1, -1) ">for the group</button></p></div>
+                <div v-for="member in members">
+                    <p><button @click="processFastState(1, member.spenderId) ">for [[member.username]]</button></p>
+                </div>
+            </div>
             <div v-if="newData.fastState == 2">
                 <input type="number" v-model="newData.amount" step=".01">
             </div>

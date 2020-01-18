@@ -50,22 +50,30 @@ Vue.component('recap', {
         }
     },
     methods: {
-        computeShares(transactions, memberdict) {
-            var shares = {};
-            for (id in memberdict) {
-                shares[id] = 0
+        computeBalance(transactions, memberdict) {
+            let evenRepartition = {};
+            let spenderBalance = {};
+            for (spenderId in memberdict) {
+                spenderBalance[spenderId] = 0
+                evenRepartition[spenderId] = 1 / Object.keys(memberdict).length;
             }
-            var total = 0;
             for (t of transactions) {
-                shares[t.source] += parseFloat(t.amount);
-                total += parseFloat(t.amount);
+                spenderBalance[t.source] += parseFloat(t.amount)
+                let repartition = {};
+                if (Object.keys(t.destination).length === 0 && t.destination.constructor === Object) {
+                    repartition = evenRepartition;
+                }
+                else {
+                    repartition = t.destination;
+                }
+                for (let spenderId in repartition) {
+                    spenderBalance[spenderId] -= parseFloat(t.amount) * repartition[spenderId];
+                }
             }
-            var mean = total / Object.keys(memberdict).length;
-            for (id in shares) {
-                shares[id] -= mean;
-                shares[id] = shares[id].toFixed(2);
+            for (spenderId in spenderBalance) {
+                spenderBalance[spenderId] = spenderBalance[spenderId].toFixed(2);
             }
-            return shares;
+            return spenderBalance;
         },
         getSumStyle(sum) {
             if (sum > 0) {
@@ -91,7 +99,7 @@ Vue.component('recap', {
     props: ["transactions", "userinfo", "memberdict"],
     template: `
     <table class="recap_table" style="border: 1px solid #eeeeee">
-        <tr v-for="(amount, id) in computeShares(transactions, memberdict)">
+        <tr v-for="(amount, id) in computeBalance(transactions, memberdict)">
             <td> {{ memberdict[id].username }} </td>
             <td> <span v-html="getArrow(parseFloat(amount))"></span> </td>
             <td :style="getSumStyle(amount)"> {{ amount }} </td>
@@ -125,6 +133,7 @@ new Vue({
             amount: null,
             categoryId: 0,
             fastState: 0,
+            destination: -1,
         },
 
         updateData: {
@@ -181,7 +190,7 @@ new Vue({
             var sid = this.selectedGroupId;
             if (sid > -1)
                 return this.transactions
-                  .filter(t => (t.destination == sid))
+                  .filter(t => (t.group == sid))
                   .filter(this.isSelected);
             return [];
         },
@@ -214,12 +223,23 @@ new Vue({
         },
 
         newTransaction: function () {
+            let computedDestination = {};
+            if (this.newData.destination > -1) {
+                computedDestination[this.newData.destination] = 1;
+            }
+            else {
+                for (spenderId in this.memberDict) {
+                    computedDestination[spenderId] = 1 / Object.keys(this.memberDict).length;
+                }
+            }
             axios.post('/lbcflba/api/new',
                 {
-                   'destination': this.selectedGroupId, 'source': this.newData.sourceId,
+                   'group': this.selectedGroupId,
+                   'source': this.newData.sourceId,
                    'text': this.newData.text,
                    'amount': this.newData.amount,
-                   'category': this.newData.categoryId
+                   'category': this.newData.categoryId,
+                   'destination': computedDestination,
                 },
                 {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
             .then(response => this.getTransactions())
@@ -309,11 +329,10 @@ new Vue({
             if (actualState == 0) {
                 spenderId = data;
                 this.newData.sourceId = spenderId;
-                this.newData.fastState += 1; // skip next, for now
             }
             else if (actualState == 1) {
-//                spenderId = data;
-//                this.newData.destination = spenderId;
+                spenderId = data;
+                this.newData.destination = spenderId;
             }
             else if (actualState == 2) {
             }
@@ -345,6 +364,7 @@ new Vue({
             this.newData.text = '';
             this.newData.amount = 0;
             this.newData.categoryId = 0;
+            this.newData.destination = -1;
             this.newData.fastState = 0;
         },
         setUpdateDataTo: function(transaction) {
