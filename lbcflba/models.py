@@ -51,7 +51,8 @@ class Transaction(models.Model):
     # , related_name="+": create no backward relation
     # see https://docs.djangoproject.com/en/2.2/ref/models/fields/#django.db.models.ForeignKey.related_name
     source = models.ForeignKey(Spender, on_delete=models.CASCADE, related_name="+")
-    destination = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="+")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="+")
+    destination = models.TextField(default="")
     amount = models.DecimalField(max_digits=14, decimal_places=2)
     text = models.TextField()
     category = models.PositiveSmallIntegerField(default=0)
