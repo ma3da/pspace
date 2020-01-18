@@ -68,7 +68,7 @@ class TransactionList(APIView):
             transactions = Transaction.objects.all()
             serializer = TransactionSerializer(transactions, many=True)
             for t in serializer.data:
-                t["destination"] = to_dict(t["destination"]) if t["destination"] else {}
+                t["destination"] = to_dict(t["destination"])
             return Response(serializer.data)
         except Exception as e:
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
