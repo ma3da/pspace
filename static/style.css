@@ -193,8 +193,13 @@ input[type=text], input[type=password] {
 
 .modal-footer {
     display: flex;
-    justify-content: space-between;
     margin: auto;
+    width: 100%;
+}
+
+.modal-button-container {
+    flex: 1 1 0px;
+    text-align: center;
 }
 
 .modal-table-options {

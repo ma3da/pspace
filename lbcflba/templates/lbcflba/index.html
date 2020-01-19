@@ -23,13 +23,17 @@
                         </slot>
                     </div>
                     <div class="modal-footer">
-                        <span>
+                        <div class="modal-button-container">
                             <button @click="close">
                                 <i class="fa fa-close"></i>
                             </button>
-                        </span>
-                        <span><slot name="button-middle"></slot></span>
-                        <span><slot name="button-right"></slot></span>
+                        </div>
+                        <div class="modal-button-container">
+                            <slot name="button-middle"></slot>
+                        </div>
+                        <div class="modal-button-container">
+                            <slot name="button-right"></slot>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,25 +95,29 @@
     </modal>
         <modal v-if="showUpdateModal" @close="showUpdateModal = false">
         <h3 slot="header">Update task</h3>
-        <p slot="body">
+        <div slot="body">
+            <p>
             <input type="date" v-model="updateData.date">
-            <br>
+            </p>
+            <p>
             <textarea v-model="updateData.text"></textarea>
-            <br>
+            </p>
+            <p>
             <select v-model="updateData.categoryId">
                 <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
             </select>
-            <br>
-            <br>
+            </p>
+            <p>
             <button @click="deleteTransaction">delete transaction</button>
-        </p>
+            </p>
+        </div>
         <button slot="button-right" @click="updateTransaction">save</button>
     </modal>
 
     <modal v-if="showOptionModal" @close="showOptionModal = false">
         <h3 slot="header">Options</h3>
         <div slot="body">
-            <h4>Categories</h3>
+            <h3>Categories</h3>
             <table class="modal-table-options">
                 <tr>
                     <td><input v-model="optionData.categoryName" placeholder="new category"></td>
@@ -185,6 +193,7 @@
                 </p>
             </div>
         </div>
+            <button slot="button-middle" v-if="newData.fastState > 0" @click="backFastState(newData.fastState) "><i class="fa fa-arrow-left"></i></button>
             <button slot="button-right" v-if="newData.fastState == 2" @click="processFastState(newData.fastState, null) "><i class="fa fa-arrow-right"></i></button>
             <button slot="button-right" v-if="newData.fastState == 3" @click="processFastState(newData.fastState, null) "><i class="fa fa-check"></i></button>
     </modal>

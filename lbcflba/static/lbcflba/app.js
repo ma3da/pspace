@@ -343,6 +343,11 @@ new Vue({
 
             this.newData.fastState += 1;
         },
+        backFastState: function(actualState) {
+            if (actualState > 0) {
+                this.newData.fastState -= 1;
+            }
+        },
         closeFastNewModal: function() {
             this.showFastNewModal = false;
             this.clearNewData();
