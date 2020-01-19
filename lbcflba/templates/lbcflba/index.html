@@ -109,43 +109,56 @@
     <modal v-if="showOptionModal" @close="showOptionModal = false">
         <h3 slot="header">Options</h3>
         <div slot="body">
-            <h2>Categories</h2>
-            <p>
-                <input v-model="optionData.categoryName" placeholder="new category">
-                <button @click="newCategory">create</button>
-                <br>
-                <select v-model="optionData.categoryId" @change="updateSelection()">
-                    <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
-                </select>
-                <button @click="deleteCategory">delete</button>
-            </p>
-            <h2>Group Name</h2>
-            <p>
+            <h4>Categories</h3>
+            <table class="modal-table-options">
+                <tr>
+                    <td><input v-model="optionData.categoryName" placeholder="new category"></td>
+                    <td><button @click="newCategory">create</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <select v-model="optionData.categoryId" @change="updateSelection()">
+                        <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
+                        </select>
+                    </td>
+                    <td><button @click="deleteCategory">delete</button></td>
+                </tr>
+            </table>
+            <h3>Group Name</h3>
+            <table class="modal-table-options">
+                <tr>
+                    <td>
                 <input v-model="optionData.groupName" :placeholder="[[groupDict[selectedGroupId].name]]">
-                <button @click="renameGroup">rename</button>
-            </p>
+                    </td>
+                    <td><button @click="renameGroup">rename</button></td>
+                </tr>
+            </table>
         </div>
     </modal>
 
     <modal v-if="showFilterModal" @close="showFilterModal = false">
         <h3 slot="header">Filters</h3>
-        <p slot="body">
+        <div slot="body">
+            <p>
             <select v-model="filterData.statusId">
                 <option value="-1">all status</option>
                 <option v-for="i in [0, 1]" :value="i">[[ i ]]</option>
             </select>
-            <br>
+            </p>
+            <p>
             <select v-model="filterData.categoryId">
                 <option value="-1">all cats</option>
                 <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
             </select>
-        </p>
+            </p>
+            <br>
+        </div>
         <button slot="button-middle" @click="clearFilters">clear</button>
         <button slot="button-right" @click="showFilterModal = false"><i class="fa fa-check"></i></button>
     </modal>
 
     <modal v-if="showFastNewModal" @close="closeFastNewModal">
-        <h3 slot="header">new transaction</h3>
+        <h3 slot="header"></h3>
         <div slot="body">
             <div v-if="newData.fastState == 0">
                 <div v-for="member in members">

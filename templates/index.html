@@ -6,16 +6,16 @@
 
 {% block content %}
 <div class="vh-centering-container">
-    <div class="vh-centering">
-        <p>
-            <a class="button" href="{% url 'definition:index' %}">definition</a>
-            <br>
-            <br>
-            <a class="button" href="{% url 'timetable:index' %}">agenda</a>
-            <br>
-            <br>
-            <a class="button" href="{% url 'lbcflba:index' %}">lbcflba</a>
-        </p>
+    <div class="vh-centering indexmenu">
+            <p>
+                <a class="button" href="{% url 'definition:index' %}">definition</a>
+            </p>
+            <p>
+                <a class="button" href="{% url 'timetable:index' %}">agenda</a>
+            </p>
+            <p>
+                <a class="button" href="{% url 'lbcflba:index' %}">lbcflba</a>
+            </p>
     </div>
 </div>
 {% endblock %}

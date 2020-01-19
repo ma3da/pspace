@@ -4,5 +4,5 @@ from django.forms.widgets import PasswordInput, TextInput
 
 
 class CustomAuthForm(AuthenticationForm):
-    username = forms.CharField(widget=TextInput(attrs={'class': 'validate', 'placeholder': 'usr'}))
-    password = forms.CharField(widget=PasswordInput(attrs={'placeholder': 'pwd'}))
+    username = forms.CharField(widget=TextInput(attrs={'class': 'validate', 'autofocus': 'autofocus'}))
+    password = forms.CharField(widget=PasswordInput())
