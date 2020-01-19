@@ -1,17 +1,14 @@
+{% extends "base.html" %}
 {% load static %}
+
+{% block head %}
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
     <title>definition</title>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>
+{% endblock %}
 
-</head>
-
-<body>
+{% block content %}
 <div id="app">
     <div class="definition-content centering" style="color:#212121">
         <div>
@@ -22,13 +19,11 @@
         <div class="centering">
             <form action="#">
                 <input type="text" v-model="word"/>
-                <input type="submit" value="go" @click="loadDef"/>
-                <a href="{% url 'index' %}" class="button">menu</a>
+                <button @click="loadDef"><i class="fa fa-search"></i></button>
             </form>
         </div>
     </div>
 </div>
-</body>
 
 <script>
     new Vue({
@@ -37,7 +32,6 @@
         data: {
             definitionHtml: '',
             word: '',
-            value: 'heho',
         },
         methods: {
             loadDef: function () {
@@ -60,4 +54,4 @@
     })
 
 </script>
-</html>
+{% endblock %}

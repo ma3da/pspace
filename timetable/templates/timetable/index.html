@@ -1,15 +1,11 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<head>
+
+{% block head %}
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js">const axios = require('axios');</script>
     <script src="https://momentjs.com/downloads/moment.min.js"></script>
     <script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
-</head>
 
 <script type="text/x-template" id="modal-template">
     <transition name="modal">
@@ -40,14 +36,13 @@
         </div>
     </transition>
 </script>
+{% endblock %}
 
-<body>
-<!-- app -->
+{% block content %}
 <div id="app" class="centering">
     <div class="centering">
         <p>
-        <a href="#" class="button" @click="showNewModal = true">new</a>
-        <a href="{% url 'index' %}" class="button">menu</a>
+        <button @click="showNewModal = true"><i class="fa fa-plus"></i></button>
         </p>
     </div>
     <daily class="week" v-for="block in weekBlocks"
@@ -88,6 +83,5 @@
 </div>
 
 <script src="{% static 'timetable/blocks.js' %}"></script>
+{% endblock %}
 
-</body>
-</html>
