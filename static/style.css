@@ -239,8 +239,37 @@ input[type=text], input[type=password] {
   margin: auto;
 }
 
-.indexmenu {
+.index-menu {
+    width:70%;
+    margin: auto;
+    color: white;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+    .index-menu {
+        width: 100%;
+    }
+}
+
+.index-menu > a {
     text-align:center;
+    text-decoration: none;
+    background-color: #42b983;
+    color: white;
+    font-size: 1.2em;
+    margin: .5em;
+    padding: 1em 2em 1em 2em;
+    flex: 1 1 0;
+}
+
+.index-menu > a:hover {
+    background-color: white;
+    color: #42b983;
 }
 
 .searchbar {
