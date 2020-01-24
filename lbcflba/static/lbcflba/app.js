@@ -121,6 +121,7 @@ new Vue({
         filterData: {
             statusId: -1,
             categoryId: -1,
+            spenderId: -1,
         },
 
         userData: {
@@ -356,12 +357,14 @@ new Vue({
         isSelected: function(transaction) {
             var boolStatus = this.filterData.statusId < 0 || (this.filterData.statusId == transaction.status);
             var boolCategory = this.filterData.categoryId < 0 || (this.filterData.categoryId == transaction.category);
-            return boolStatus && boolCategory;
+            var boolSpender = this.filterData.spenderId < 0 || (this.filterData.spenderId == transaction.source)
+            return boolStatus && boolCategory && boolSpender;
         },
         clearFilters: function() {
             this.filterData = {
                 statusId: -1,
                 categoryId: -1,
+                spenderId: -1,
             };
         },
         clearNewData: function() {

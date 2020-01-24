@@ -162,6 +162,13 @@
                 <option v-for="(name, id) in categoryDict" :value="id">[[ name ]]</option>
             </select>
             </p>
+            <p>
+            <select v-model="filterData.spenderId">
+                <option value="-1">all spenders</option>
+                <option v-for="member in memberDict" :value="member.spenderId">[[
+                member.username ]]</option>
+            </select>
+            </p>
             <br>
         </div>
         <button slot="button-middle" @click="clearFilters">clear</button>
