@@ -51,11 +51,14 @@
             <a href="#" class="lbcflba-menu-icon" @click="selectedGroupId = -1"><i class="fa fa-bars"></i></a>
     </div>
     <div class="centering" v-if="selectedGroupId == -1" style="min-width:33%">
-        <div class="centering" v-for="group in groups">
+        <div class="centering">
             <p>
-            I am <input v-model="userData.name" :placeholder="userInfo.username"> 
+            I am <input style="border:none; background-color:white; color:black;
+            font-size:1em" v-model="userData.name" :placeholder="userInfo.username"> 
             <button @click="renameUser"><i class="fa fa-check"></i></button>
             </p>
+        </div>
+        <div class="centering" v-for="group in groups">
             <br>
             <a class="button" href="#" @click="selectedGroupId = group.id; showChooseModal = false;">[[ group.name ]]</a><br>
         </div>
