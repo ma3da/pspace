@@ -20,6 +20,17 @@ def format_article(art):
     return "</br>".join([str(div) for div in art])
 
 
+def url_def(word):
+    return f"https://www.cnrtl.fr/definition/{word}"
+
+
+def url_tag(soup, word):
+    link = soup.new_tag("a")
+    link.string = word
+    link["href"] = "#"
+    return link
+
+
 def get_definition_html(word):
     word = word.lower()
     base_url = "https://www.cnrtl.fr/definition"
@@ -32,19 +43,31 @@ def get_definition_html(word):
                 filter(lambda x: x is not None,
                 map(re_num.search,
                 map(operator.itemgetter("onclick"), links)))))
-    def_html = []
+    main_divs = []
     for suffix in suffixes:
         print("process", suffix)
         url = f"{base_url}/{suffix}"
         resp = requests.get(url)
         soup = bs4.BeautifulSoup(resp.content, "html.parser")
+
+        # transform definitions words into links
+        for tag in soup.find_all(class_="tlf_cdefinition"):
+            s = str(tag.string)
+            tag.clear()
+            for w in s.split():
+                if tag.contents:
+                    tag.append(" ")
+                tag.append(url_tag(soup, w))
+
         arts = [div for div in soup("div")
                 if "id" in div.attrs and div["id"].startswith("art")]
         if arts:
-            def_html.extend(arts[0])
-            def_html.append("<hr>")
+            art_html = arts[0]
 
-    return format_article(def_html)
+            main_divs.extend(art_html)
+            main_divs.append("<hr>")
+
+    return format_article(main_divs)
 
 
 class DefinitionView(APIView):

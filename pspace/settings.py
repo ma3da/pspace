@@ -11,7 +11,13 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-from .nocommit import hiddensettings
+try:
+    from .nocommit import hiddensettings
+except ModuleNotFoundError as e:
+    fp = os.path.join(os.path.dirname(__file__), ".nocommit", "hiddensettings.py")
+    print(f"File missing {fp}")
+    print(f"Check template in /util")
+    exit()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
