@@ -11,8 +11,12 @@
 {% block content %}
 <div id="app">
     <div class="definition-content centering" style="color:#212121">
-        <div>
-            <span v-html="definitionHtml"></span>
+        <div class="article" v-for="article in data">
+            <div class="word">[[ article.word ]]</div>
+            <div class="bloc" v-for="bloc in article.blocs">
+                <div class="definition">[[ formatDefinition(bloc.definition) ]]</div>
+            </div>
+            <br>
         </div>
     </div>
     <div class="searchbar">
@@ -30,7 +34,7 @@
         delimiters: ['[[', ']]'],
         el: '#app',
         data: {
-            definitionHtml: '',
+            data: '',
             word: '',
         },
         methods: {
@@ -38,7 +42,7 @@
                 if (this.word != '') {
                 axios
                   .get('/def/api/def/' + this.word)
-                  .then(response => (this.definitionHtml = response.data.htmlcontent))
+                  .then(response => (this.data = response.data))
                   .catch(error => this.printerr(error));
                 }
             },
@@ -47,6 +51,9 @@
             },
             printerr: function (err_msg) {
                 alert("ça a planté...\n\n" + err_msg);
+            },
+            formatDefinition: function(words) {
+                return words.join(" ");
             }
         },
         mounted() {

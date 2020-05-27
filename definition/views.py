@@ -5,6 +5,7 @@ import requests
 import bs4
 import re
 import operator
+import os
 
 def index(request):
     return render(request, "definition/index.html")
@@ -31,46 +32,67 @@ def url_tag(soup, word):
     return link
 
 
-def get_definition_html(word):
+def get_html_src(word):
+    """return {"article number": "html content bytes"} for given word"""
+
     word = word.lower()
     base_url = "https://www.cnrtl.fr/definition"
     url = f"https://www.cnrtl.fr/definition/{word}"
-    resp = requests.get(url)
-    soup = bs4.BeautifulSoup(resp.content, "html.parser")
-    links = [link for link in soup("a") if link.has_attr("onclick")]
-    re_num = re.compile(f"/definition/({word}//[0-9])")
-    suffixes = list(map(lambda x: x.group(1), 
-                filter(lambda x: x is not None,
-                map(re_num.search,
-                map(operator.itemgetter("onclick"), links)))))
-    main_divs = []
-    for suffix in suffixes:
-        print("process", suffix)
-        url = f"{base_url}/{suffix}"
+
+    articles = {}
+    # for dev, to stop spamming mothership:
+    src_fp = os.path.join(os.path.expanduser("~"), "tmp", "pspace-def", word)
+    if not os.path.exists(src_fp):
+        print("save")
+        os.makedirs(src_fp)
         resp = requests.get(url)
         soup = bs4.BeautifulSoup(resp.content, "html.parser")
+        links = [link for link in soup("a") if link.has_attr("onclick")]
+        re_num = re.compile(f"/definition/{word}//([0-9])")
+        suffixes = list(map(lambda x: x.group(1), 
+                    filter(lambda x: x is not None,
+                    map(re_num.search,
+                    map(operator.itemgetter("onclick"), links)))))
+        for suffix in suffixes:
+            url = f"{base_url}/{word}/{suffix}"
+            resp = requests.get(url)
+            with open(os.path.join(src_fp, suffix), "wb") as f:
+                f.write(resp.content)
+            articles[suffix] = resp.content
+    else:
+        print("read")
+        for suffix in os.listdir(src_fp):
+            with open(os.path.join(src_fp, suffix), "rb") as f:
+                articles[suffix] = f.read()
+
+    return articles
+
+
+def get_definition_html(word):
+    articles = []
+    sources = get_html_src(word)
+    for suffix, content in sources.items():
+        soup = bs4.BeautifulSoup(content, "html.parser")
+
+        article = {}
+        
+        detail = soup.find(class_="tlf_cvedette") 
+        print(detail.contents)
+        article["word"] = detail.text if detail else word
+        article["blocs"] = []
 
         # transform definitions words into links
         for tag in soup.find_all(class_="tlf_cdefinition"):
-            s = str(tag.string)
-            tag.clear()
-            for w in s.split():
-                if tag.contents:
-                    tag.append(" ")
-                tag.append(url_tag(soup, w))
+            d = {}
+            article["blocs"].append(d)
 
-        arts = [div for div in soup("div")
-                if "id" in div.attrs and div["id"].startswith("art")]
-        if arts:
-            art_html = arts[0]
+            d["definition"] = str(tag.string).split()
+        articles.append(article)
 
-            main_divs.extend(art_html)
-            main_divs.append("<hr>")
-
-    return format_article(main_divs)
+    return articles
 
 
 class DefinitionView(APIView):
     def get(self, request, word, format=None):
-        html_content = get_definition_html(word) if check_input(word) else "Nope"
-        return Response({"htmlcontent": html_content})
+        data = get_definition_html(word) if check_input(word) else "Nope"
+        return Response(data)
