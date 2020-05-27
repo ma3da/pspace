@@ -1,6 +1,10 @@
-db.sqlite3
 **__pycache__
+*.pyc
+venv
+
+.idea
+*.swp
+
 **nocommit
 
-venv
-.idea
+db.sqlite3
