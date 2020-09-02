@@ -59,7 +59,7 @@ def get_definition_html(word):
                       map(operator.itemgetter("onclick"), links)))):
             url = f"{base_url}/{suffix}"
             resp = requests.get(url)
-            articles_src.append(str(resp.content))
+            articles_src.append(resp.content.decode("utf8"))
         dao_defsrc.write(word, json.dumps(articles_src))
 
     articles_divs = []
