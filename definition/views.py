@@ -7,8 +7,14 @@ import re
 import operator
 from . import dao
 import json
+from .nocommit import hiddensettings
 
-dao_defsrc = dao.DefinitionSrcDao(dbname="test", user="", pwd="")
+dao_defsrc = dao.DefinitionSrcDao(
+    dbname=hiddensettings.DB_NAME,
+    user=hiddensettings.DB_USER,
+    pwd=hiddensettings.DB_PWD,
+    host=hiddensettings.DB_HOST
+)
 
 
 def index(request):
