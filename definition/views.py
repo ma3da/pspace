@@ -5,6 +5,10 @@ import requests
 import bs4
 import re
 import operator
+from . import dao
+import json
+
+dao_defsrc = dao.DefinitionSrcDao(dbname="test", user="", pwd="")
 
 
 def index(request):
@@ -22,12 +26,13 @@ def format_articles(divs):
 
 
 def get_articles_src_already_stored(word):
-    return None
+    src = dao_defsrc.get(word)
+    if src is not None:
+        return json.loads(src)
 
 
 def get_definition_html(word):
-    """for the given word, return html code to embed."""
-
+    """For the given word, return html code to embed."""
     word = word.lower()
     base_url = "https://www.cnrtl.fr/definition"
     url = f"https://www.cnrtl.fr/definition/{word}"
@@ -48,7 +53,8 @@ def get_definition_html(word):
                       map(operator.itemgetter("onclick"), links)))):
             url = f"{base_url}/{suffix}"
             resp = requests.get(url)
-            articles_src.append(resp.content)
+            articles_src.append(str(resp.content))
+        dao_defsrc.write(word, json.dumps(articles_src))
 
     articles_divs = []
     for html in articles_src:
