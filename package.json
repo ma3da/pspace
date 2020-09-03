@@ -1,0 +1,26 @@
+{
+  "name": "pspace",
+  "version": "1.0.0",
+  "description": "None",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chillax9000/pspace.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chillax9000/pspace/issues"
+  },
+  "homepage": "https://github.com/chillax9000/pspace#readme",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "font-awesome": "^4.7.0",
+    "moment": "^2.27.0",
+    "vue": "^2.6.12",
+    "vue-cookies": "^1.7.4"
+  }
+}
