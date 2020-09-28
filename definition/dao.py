@@ -2,9 +2,9 @@ import psycopg2
 
 
 class DefinitionSrcDao:
-    """ Record structure: (id, word, src) """
+    """ Record structure: (word, src) """
 
-    def __init__(self, dbname, user, pwd, host=None, table_name="test"):
+    def __init__(self, dbname, user, pwd, host=None, table_name="definition_sources"):
         self.dbname = dbname
         self.table_name = table_name
         self.conn = psycopg2.connect(dbname=dbname, user=user, password=pwd,
@@ -24,7 +24,7 @@ class DefinitionSrcDao:
             raise ValueError(f"Expected to fetch <= 1 record for word {word}, "
                              "but got {len(fetched)}. Ids: "
                              "{list(map(operator.itemgetter(0), fetched))}")
-        return fetched[0][2] if fetched else None
+        return fetched[0][1] if fetched else None
 
     def write(self, word, src) -> None:
         """Writes a record for word, overwriting if it already exists.
@@ -33,7 +33,7 @@ class DefinitionSrcDao:
         with self.conn as conn:
             if fetched is None:
                 with conn.cursor() as cur:
-                    cur.execute("insert into test (word, src) values (%s, %s);", (word, src))
+                    cur.execute(f"insert into {self.table_name} (word, src) values (%s, %s);", (word, src))
             else:
                 with conn.cursor() as cur:
                     cur.execute(f"update {self.table_name} set src = %s where word = %s);", (src, word))
