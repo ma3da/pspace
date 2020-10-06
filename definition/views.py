@@ -41,6 +41,12 @@ def has_class(tag, class_name):
     return isinstance(tag, bs4.element.Tag) and tag.has_attr("class") and class_name in tag["class"]
 
 
+def process_article_src_dummy(html):
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    article = soup.find("div", id=re.compile("^art"))
+    return "<br>".join(map(str, article)) if article else ""
+
+
 def process_article_src(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
     article = soup.find("div", id=re.compile("^art"))
@@ -82,7 +88,7 @@ def process_article_src(html):
     return f"<p>{word}</p><div>{flatten(tree)}</div>"
 
 
-def get_definition_html(word):
+def get_definition_html(word, process_fn):
     """For the given word, return html code to embed."""
     word = word.lower()
     base_url = "https://www.cnrtl.fr/definition"
@@ -107,10 +113,12 @@ def get_definition_html(word):
             articles_src.append(resp.content.decode("utf8"))
         dao_defsrc.write(word, json.dumps(articles_src))
 
-    return format_articles(map(process_article_src, articles_src))
+    return format_articles(map(process_fn, articles_src))
 
 
 class DefinitionView(APIView):
-    def get(self, request, word, format=None):
-        html_content = get_definition_html(word) if check_input(word) else "Nope"
+    def post(self, request, word, format=None):
+        process_fn = (process_article_src_dummy if request.data["no_process"]
+                      else process_article_src)
+        html_content = get_definition_html(word, process_fn) if check_input(word) else "Nope"
         return Response({"htmlcontent": html_content})

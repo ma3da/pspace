@@ -6,6 +6,7 @@
     <title>definition</title>
     <script src="{% static 'js/vue.min.js' %}"></script>
     <script src="{% static 'js/axios.min.js' %}">const axios = require('axios');</script>
+    <script src="{% static 'js/vue-cookies.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -18,6 +19,7 @@
     <div class="searchbar">
         <div class="centering">
             <form action="#">
+                <input type="checkbox" v-model="noProcess"><label>full</label>
                 <input type="text" v-model="word"/>
                 <button @click="loadDef"><i class="fa fa-search"></i></button>
             </form>
@@ -32,12 +34,15 @@
         data: {
             definitionHtml: '',
             word: '',
+            noProcess: true,
         },
         methods: {
             loadDef: function () {
                 if (this.word != '') {
                 axios
-                  .get('/def/api/def/' + this.word)
+                  .post('/def/api/def/' + this.word,
+                        {'no_process': this.noProcess},
+                        {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
                   .then(response => (this.definitionHtml = response.data.htmlcontent))
                   .catch(error => this.printerr(error));
                 }
