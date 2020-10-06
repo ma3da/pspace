@@ -37,12 +37,49 @@ def get_articles_src_already_stored(word):
         return json.loads(src)
 
 
+def has_class(tag, class_name):
+    return isinstance(tag, bs4.element.Tag) and tag.has_attr("class") and class_name in tag["class"]
+
+
 def process_article_src(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
-    divss = [div for div in soup("div")
-             if "id" in div.attrs and div["id"].startswith("art")]
-    if divss:
-        return "<br>".join(map(str, divss[0]))
+    article = soup.find("div", id=re.compile("^art"))
+
+    if not article:
+        return ""
+
+    word = article.find_all("div", class_="tlf_cvedette")
+    if len(word) != 1:
+        raise ValueError(f"Expected to find exactly one word, found: {word}")
+    word = word[0]
+
+    def convert(tag_iter, current):
+        for tag in tag_iter:
+            if has_class(tag, "tlf_cdefinition"):
+                if not tag.find_previous_sibling(class_="tlf_csyntagme") \
+                        and not tag.find_next_sibling(class_="tlf_cdefinition"):
+                    return [tag]
+            if has_class(tag, "tlf_parah"):
+                current.append(convert(tag.children, []))
+        return current
+
+    tree = convert(article, [])
+
+    def flatten(node):
+        if isinstance(node, bs4.element.Tag):
+            return str(node)
+        # list | None
+        if not node:
+            return None
+        flattened = list(filter(lambda s: s is not None, map(flatten, node)))
+        if not flattened:
+            return None
+        elif len(flattened) == 1:
+            return flattened[0]
+        else:
+            return f"<ul>{''.join(map(lambda s: f'<li>{s}</li>', flattened))}</ul>"
+
+    return f"<p>{word}</p><div>{flatten(tree)}</div>"
 
 
 def get_definition_html(word):
@@ -70,7 +107,7 @@ def get_definition_html(word):
             articles_src.append(resp.content.decode("utf8"))
         dao_defsrc.write(word, json.dumps(articles_src))
 
-    return format_articles(map(process_article_src, filter(bool, articles_src)))
+    return format_articles(map(process_article_src, articles_src))
 
 
 class DefinitionView(APIView):
