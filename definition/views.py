@@ -28,13 +28,21 @@ def check_input(word):
 
 
 def format_articles(divs):
-    return "<br>".join([str(div) for div in divs])
+    return "<hr>".join(divs)
 
 
 def get_articles_src_already_stored(word):
     src = dao_defsrc.get(word)
     if src is not None:
         return json.loads(src)
+
+
+def process_article_src(html):
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    divss = [div for div in soup("div")
+             if "id" in div.attrs and div["id"].startswith("art")]
+    if divss:
+        return "<br>".join(map(str, divss[0]))
 
 
 def get_definition_html(word):
@@ -62,16 +70,7 @@ def get_definition_html(word):
             articles_src.append(resp.content.decode("utf8"))
         dao_defsrc.write(word, json.dumps(articles_src))
 
-    articles_divs = []
-    for html in articles_src:
-        soup = bs4.BeautifulSoup(html, "html.parser")
-        divss = [div for div in soup("div")
-                 if "id" in div.attrs and div["id"].startswith("art")]
-        if divss:
-            articles_divs.extend(divss[0])
-            articles_divs.append("<hr>")
-
-    return format_articles(articles_divs)
+    return format_articles(map(process_article_src, filter(bool, articles_src)))
 
 
 class DefinitionView(APIView):
