@@ -40,3 +40,14 @@ class DefinitionSrcDao:
 
     def close(self):
         self.conn.close()
+
+
+class DummyDao:
+    def get(self, *a, **ka):
+        return None
+
+    def write(self, *a, **ka):
+        pass
+
+    def close(self):
+        pass

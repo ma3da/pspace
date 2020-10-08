@@ -8,13 +8,21 @@ import operator
 from . import dao
 import json
 from .nocommit import hiddensettings
+import psycopg2
 
-dao_defsrc = dao.DefinitionSrcDao(
-    dbname=hiddensettings.DB_NAME,
-    user=hiddensettings.DB_USER,
-    pwd=hiddensettings.DB_PWD,
-    host=hiddensettings.DB_HOST
-)
+try:
+    dao_defsrc = dao.DefinitionSrcDao(
+        dbname=hiddensettings.DB_NAME,
+        user=hiddensettings.DB_USER,
+        pwd=hiddensettings.DB_PWD,
+        host=hiddensettings.DB_HOST
+    )
+except psycopg2.OperationalError as e:  # e.g. connection issue
+    if "dao_defsrc" in globals():
+        dao_defsrc.close()
+    print(e)
+    print("Using a dummy DAO, no data to be read or written.")
+    dao_defsrc = dao.DummyDao()
 
 
 def index(request):
