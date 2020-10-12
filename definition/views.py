@@ -29,12 +29,6 @@ def index(request):
     return render(request, "definition/index.html")
 
 
-def check_input(word):
-    if word == "":
-        return False
-    return True
-
-
 def format_articles(divs):
     return "<hr>".join(divs)
 
@@ -97,15 +91,19 @@ def process_article_src(html):
 
 
 def get_definition_html(word, process_fn):
-    """For the given word, return html code to embed."""
+    """For the given word, return html code to embed.
+    :returns: (str, str): html code, data source (local/remote)
+    """
     word = word.lower()
     base_url = "https://www.cnrtl.fr/definition"
     url = f"https://www.cnrtl.fr/definition/{word}"
     articles_src = []
+    source = "remote"
 
     _stored = get_articles_src_already_stored(word)
     if _stored is not None:
         articles_src = _stored
+        source = "local"
     else:
         resp = requests.get(url)
         html_content = resp.content
@@ -121,12 +119,19 @@ def get_definition_html(word, process_fn):
             articles_src.append(resp.content.decode("utf8"))
         dao_defsrc.write(word, json.dumps(articles_src))
 
-    return format_articles(map(process_fn, articles_src))
+    return format_articles(map(process_fn, articles_src)), source
+
+
+def check_input(word):
+    return word.strip() != ""
 
 
 class DefinitionView(APIView):
     def post(self, request, word, format=None):
-        process_fn = (process_article_src_dummy if request.data["no_process"]
-                      else process_article_src)
-        html_content = get_definition_html(word, process_fn) if check_input(word) else "Nope"
-        return Response({"htmlcontent": html_content})
+        process_func = (process_article_src_dummy if request.data["no_process"]
+                        else process_article_src)
+        html_content, data_src = "Nope", None
+        if check_input(word):
+            word = word.strip()
+            html_content, data_src = get_definition_html(word, process_func)
+        return Response({"htmlcontent": html_content, "datasource": data_src})

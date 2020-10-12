@@ -11,6 +11,7 @@
 
 {% block content %}
 <div id="app">
+    <p> source: [[ dataSource ]] </p>
     <div class="definition-content centering" style="color:#212121">
         <div>
             <span v-html="definitionHtml"></span>
@@ -35,15 +36,17 @@
             definitionHtml: '',
             word: '',
             noProcess: true,
+            dataSource: "?",
         },
         methods: {
             loadDef: function () {
-                if (this.word != '') {
+                if (this.word.trim() != '') {
                 axios
                   .post('/def/api/def/' + this.word,
                         {'no_process': this.noProcess},
                         {headers: {'X-CSRFToken': $cookies.get('csrftoken')}})
-                  .then(response => (this.definitionHtml = response.data.htmlcontent))
+                  .then(response => {this.definitionHtml = response.data.htmlcontent;
+                                     this.dataSource = response.data.datasource;})
                   .catch(error => this.printerr(error));
                 }
             },
