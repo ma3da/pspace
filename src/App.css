@@ -1,0 +1,38 @@
+html, body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.centering {
+    display:table;
+    margin: 0 auto;
+}
+
+.definition-content {
+    overflow:auto;
+    width:96vw;
+    padding-bottom:50vh;
+}
+
+.searchbar {
+  overflow: hidden;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100vw;
+  background-color: white;
+}
+
+.searchbar text {
+}
+
+.searchbar button {
+  background-color: black;
+  color: white;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0px;
+  padding: .5em;
+}
