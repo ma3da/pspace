@@ -7,13 +7,13 @@ function load(word, setter) {
   let _word = word.trim();
   if (_word !== "") {
     axios
-      .post("/def/api/def/" + _word, 
+      .post("/api/" + _word, 
                {"no_process": true},
                {headers: {"X-CSRFToken": Cookies.get("csrftoken")}})
       .then(resp => {setter(resp.data.htmldefinition)})
       .catch(err => {console.log(err); setter(err.toString())});
   } else {
-    setter("what kind of word is this");
+    setter("what word is this: '" + word + "'?");
   }
 }
 
