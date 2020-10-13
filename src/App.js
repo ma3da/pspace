@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './App.css';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 function load(word, process, htmlSetter, srcSetter) {
   let _word = word.trim();
@@ -30,19 +32,25 @@ function App() {
   const [dataSource, setDataSrc] = useState("");
   const [process, setProcess] = useState(false); // == checkbox state at start?
   return (
-  <div>
-    <div className="definition-content centering">
-      <p> source: { dataSource } </p>
-      <div dangerouslySetInnerHTML={{__html: definitionHtml}} />
+  <div id="definition-main">
+    <div className="definition-center">
+      <div className="definition-content centering">
+        <div dangerouslySetInnerHTML={{__html: definitionHtml}} />
+      </div>
     </div>
+
     <div className="searchbar">
-      <div className="centering">
+      <div classname="searchbar-info">source: { dataSource }</div>
+      <div className="searchbar-tools">
+      <form action="#">
         <label>
         <input type="checkbox" onChange={e => setProcess(e.target.checked)} />slim</label>
         <input onChange={e => setWord(e.target.value)} />
-        <button onClick={() => load(word, process, setDefHtml, setDataSrc)}>search</button>
+        <button onClick={() => load(word, process, setDefHtml, setDataSrc)}><FontAwesomeIcon icon={faSearch} color="black" /></button>
+      </form>
       </div>
     </div>
+
   </div>
   );
 }

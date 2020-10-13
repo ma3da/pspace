@@ -1,38 +1,52 @@
-html, body {
+html, body, #root {
     font-family: 'Helvetica', 'Arial', sans-serif;
     width: 100%;
     height: 100%;
     margin: 0;
 }
 
+#definition-main {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .centering {
-    display:table;
-    margin: 0 auto;
+    margin: auto;
+}
+
+.definition-center {
+    flex: 1;
+    overflow:auto;
 }
 
 .definition-content {
-    overflow:auto;
-    width:96vw;
-    padding-bottom:50vh;
+    width: 80ch;
+    padding-top: 2em;
+    padding-bottom:40vh;
 }
 
 .searchbar {
-  overflow: hidden;
-  position: fixed;
-  bottom: 0px;
-  left: 0px;
-  width: 100vw;
+  width: 100%;
   background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: lightgrey;
 }
 
-.searchbar text {
+.searchbar-info {
+}
+
+.searchbar-tools {
 }
 
 .searchbar button {
-  background-color: black;
+  background-color: lightgrey;
   color: white;
   border: 0;
   box-shadow: none;
-  border-radius: 0px;
   padding: .5em;
 }
