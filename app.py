@@ -13,8 +13,9 @@ def hello_world():
 
 @app.route("/api/<word>", methods=["POST"])
 def serve(word):
-    process_func = (defv.process_article_src_dummy if request.form.get("no_process", False)
-                    else defv.process_article_src)
+    data = request.get_json()
+    process_func = (defv.process_article_src if data.get("process", False)
+                    else defv.process_article_src_dummy)
     html_content, data_src = "No definition found.", None
     if defv.check_input(word):
         word = word.strip()
