@@ -1,0 +1,3 @@
+# psycopg2 (postgres)
+python3-dev
+libpq-dev

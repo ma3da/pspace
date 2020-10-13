@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+
+  flask:
+    build: ./back
+    container_name: flasky
+    restart: always
+    environment:
+      - APP_NAME=MyFlaskApp
+    expose:
+      - 8080
+
+  nginx:
+    build: ./nginx
+    container_name: nginxy
+    restart: always
+    ports:
+      - "80:80"
+

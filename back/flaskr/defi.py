@@ -1,10 +1,10 @@
+from flaskr import dao
+from flaskr.nocommit import hiddensettings
 import requests
 import bs4
 import re
 import operator
-from . import dao
 import json
-from .nocommit import hiddensettings
 import psycopg2
 
 try:

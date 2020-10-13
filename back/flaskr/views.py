@@ -1,14 +1,11 @@
-from flask import Flask, send_from_directory, request
-import back.views as defv
-
-app = Flask(__name__,
-            static_folder="build/static"
-            )
+from flask import send_from_directory, request
+from flaskr import app
+import flaskr.defi as defv
 
 
 @app.route('/')
 def hello_world():
-    return send_from_directory("build", "index.html")
+    return send_from_directory("../build", "index.html")
 
 
 @app.route("/api/<word>", methods=["POST"])
