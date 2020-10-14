@@ -1,11 +1,11 @@
-from flask import send_from_directory, request
-from flaskr import app
+from flask import request, send_from_directory
+from flaskr import app, DATA_FP
 import flaskr.defi as defv
 
 
 @app.route('/')
 def hello_world():
-    return send_from_directory("../build", "index.html")
+    return send_from_directory(DATA_FP, "index.html")
 
 
 @app.route("/api/<word>", methods=["POST"])

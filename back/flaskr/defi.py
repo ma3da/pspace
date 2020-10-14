@@ -1,5 +1,4 @@
 from flaskr import dao
-from flaskr.nocommit import hiddensettings
 import requests
 import bs4
 import re
@@ -8,13 +7,14 @@ import json
 import psycopg2
 
 try:
+    from flaskr.nocommit import hiddensettings
     dao_defsrc = dao.DefinitionSrcDao(
         dbname=hiddensettings.DB_NAME,
         user=hiddensettings.DB_USER,
         pwd=hiddensettings.DB_PWD,
         host=hiddensettings.DB_HOST
     )
-except psycopg2.OperationalError as e:  # e.g. connection issue
+except Exception as e:  # e.g. connection issue
     if "dao_defsrc" in globals():
         dao_defsrc.close()
     print(e)
