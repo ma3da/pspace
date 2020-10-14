@@ -10,6 +10,8 @@ services:
       - APP_NAME=MyFlaskApp
     expose:
       - 8080
+    depends_on:
+      - pgdb
 
   nginx:
     build: ./nginx
@@ -18,3 +20,18 @@ services:
     ports:
       - "80:80"
 
+  pgdb:
+    build: ./pgdb
+    container_name: postgresy
+    restart: always
+    environment:
+      - POSTGRES_DB=pspace
+      - POSTGRES_USER=pspace
+      - POSTGRES_PASSWORD=pspace
+    expose:
+      - 5432
+    volumes:
+      - "testy_pgdata:/var/lib/postgresql/data"
+
+volumes:
+  testy_pgdata:
