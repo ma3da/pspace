@@ -1,6 +1,6 @@
 from flask import request, send_from_directory
 from flask.json import jsonify
-from flask_login import UserMixin, login_required, login_user
+from flask_login import UserMixin, login_required, login_user, logout_user
 from flaskr import app, DATA_FP, login_manager
 import flaskr.defi as defv
 
@@ -16,7 +16,7 @@ def load_user(user_id):
         return User(user_id)
 
 
-@app.route('/login', methods=['POST'])
+@app.route("/login", methods=["POST"])
 def login():
     logged = False
     data = request.get_json()
@@ -26,13 +26,13 @@ def login():
     return jsonify({"logged": logged})
 
 
-@app.route('/logout')
+@app.route("/logout", methods=["POST"])
 def logout():
     logout_user()
-    return index()
+    return jsonify({"logged": False})
 
 
-@app.route('/')
+@app.route("/")
 def index():
     print(DATA_FP)
     return send_from_directory(DATA_FP, "index.html")

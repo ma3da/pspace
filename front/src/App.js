@@ -26,6 +26,10 @@ function load(word, process, htmlSetter, srcSetter) {
   }
 }
 
+function is_logged() {
+  return Cookies.get("logged") === "true";
+}
+
 function logIn(pwd) {
 	axios
 		.post("/login",
@@ -37,7 +41,18 @@ function logIn(pwd) {
 		.catch(console.log);
 }
 
-function Logging() {
+function logOut() {
+	axios
+		.post("/logout",
+        {},
+        {headers: {"X-CSRFToken": Cookies.get("csrftoken")}})
+		.then(resp => {
+      Cookies.set("logged", resp.data.logged);
+		})
+		.catch(console.log);
+}
+
+function Logging(props) {
 	const [pwd, setPwd] = useState("");
 	return (
 		<div id="logging">
@@ -67,6 +82,13 @@ function pusher(elem, setter) {
 	return () => setter((queue) => {return setter(queue.concat([elem]));});
 }
 
+function LogToggle(props) {
+  let logged = is_logged();
+  let value = logged ? "log out" : "log in";
+  let func = logged ? logOut : pusher(<Logging />, props.setQueue);
+  return <button onClick={func}>{value}</button>;
+}
+
 function App() {
   const [word, setWord] = useState("");
   const [definitionHtml, setDefHtml] = useState("");
@@ -84,7 +106,7 @@ function App() {
 
     <div className="searchbar">
       <div className="searchbar-info">
-				<button onClick={pusher(<Logging />, setPopQueue)}>login</button>
+        <LogToggle setQueue={setPopQueue} />
 				<span>source: {dataSource}</span>
 			</div>
       <div className="searchbar-tools">
