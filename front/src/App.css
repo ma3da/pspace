@@ -31,12 +31,12 @@ html, body, #root {
 
 .searchbar {
   width: 100%;
-  background-color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   background-color: lightgrey;
+  color: black;
 }
 
 .searchbar-info {
@@ -45,10 +45,29 @@ html, body, #root {
 .searchbar-tools {
 }
 
-.searchbar button {
-  background-color: lightgrey;
+/* .searchbar button { */
+/*   background-color: lightgrey; */
+/*   color: black; */
+/*   border: 0; */
+/*   box-shadow: none; */
+/*   padding: .5em; */
+/* } */
+
+.pop-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  right: 0px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pop-content {
+  padding: 2em;
+  background-color: black;
   color: white;
-  border: 0;
-  box-shadow: none;
-  padding: .5em;
 }
