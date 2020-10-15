@@ -1,0 +1,5 @@
+cd front
+npm run build
+cd ..
+cp -r front/build nginx
+sudo docker-compose build
