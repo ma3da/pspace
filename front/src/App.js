@@ -26,14 +26,27 @@ function load(word, process, htmlSetter, srcSetter) {
   }
 }
 
+function logIn(pwd) {
+	axios
+		.post("/login",
+        {"pwd": pwd},
+        {headers: {"X-CSRFToken": Cookies.get("csrftoken")}})
+		.then(resp => {
+      Cookies.set("logged", resp.data.logged);
+		})
+		.catch(console.log);
+}
+
 function Logging() {
-    return (
-      <div id="logging">
-        <form action="#" method="post">
-          <input type="password" name="pwd" />
-        </form>
-      </div>
-    );
+	const [pwd, setPwd] = useState("");
+	return (
+		<div id="logging">
+			<form action="javascript:void(0);">
+				<input type="password" name="pwd" onChange={e => setPwd(e.target.value)} />
+				<button onClick={() => logIn(pwd)}>log in</button>
+			</form>
+		</div>
+	);
 }
 
 function Pop(props) {
@@ -75,7 +88,7 @@ function App() {
 				<span>source: {dataSource}</span>
 			</div>
       <div className="searchbar-tools">
-				<form action="#">
+				<form action="javascript:void(0);">
 					<label>
 					<input type="checkbox" onChange={e => setProcess(e.target.checked)} />slim</label>
 					<input onChange={e => setWord(e.target.value)} />
