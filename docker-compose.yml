@@ -12,6 +12,7 @@ services:
       - 8080
     depends_on:
       - pgdb
+    command: ["./wait-for-it.sh", "pgdb:5432", "--", "uwsgi", "app.ini"]
 
   nginx:
     build: ./nginx
