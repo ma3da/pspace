@@ -1,5 +1,6 @@
 cd front
 npm run build
 cd ..
+rm -rf nginx/build
 cp -r front/build nginx
 sudo docker-compose build
