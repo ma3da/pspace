@@ -27,7 +27,6 @@ def login():
 
 @app.route("/logged", methods=["GET"])
 def logged():
-    print(current_user.is_authenticated)
     return jsonify({"logged": current_user.is_authenticated})
 
 
@@ -39,7 +38,6 @@ def logout():
 
 @app.route("/")
 def index():
-    print(DATA_FP)
     return send_from_directory(DATA_FP, "index.html")
 
 

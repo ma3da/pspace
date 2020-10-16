@@ -4,7 +4,7 @@ import psycopg2
 class DefinitionSrcDao:
     """ Record structure: (word, src) """
 
-    def __init__(self, dbname, user, pwd, host=None, table_name="definition_sources"):
+    def __init__(self, dbname, user, pwd, host=None, port=None, table_name="definition_sources"):
         self.dbname = dbname
         self.table_name = table_name
         self.conn = psycopg2.connect(dbname=dbname, user=user, password=pwd,

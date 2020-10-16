@@ -5,19 +5,22 @@ import re
 import operator
 import json
 import psycopg2
+import os
 
 try:
-    from flaskr.nocommit import hiddensettings
+    from flaskr.nocommit import hiddensettings as hs
     dao_defsrc = dao.DefinitionSrcDao(
-        dbname=hiddensettings.DB_NAME,
-        user=hiddensettings.DB_USER,
-        pwd=hiddensettings.DB_PWD,
-        host=hiddensettings.DB_HOST
+        dbname=os.environ.get("PSPACE_DB_NAME", hs.DB_NAME),
+        user=os.environ.get("PSPACE_DB_USER", hs.DB_USER),
+        pwd=os.environ.get("PSPACE_DB_PWD", hs.DB_PWD),
+        host=os.environ.get("PSPACE_DB_HOST", hs.DB_HOST),
+        port=os.environ.get("PSPACE_DB_PORT", hs.DB_PORT)
     )
 except Exception as e:  # e.g. connection issue
     if "dao_defsrc" in globals():
         dao_defsrc.close()
     print(e)
+    print(os.environ)
     print("Using a dummy DAO, no data to be read or written.")
     dao_defsrc = dao.DummyDao()
 

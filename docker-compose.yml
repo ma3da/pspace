@@ -8,6 +8,11 @@ services:
     restart: always
     environment:
       - APP_NAME=MyFlaskApp
+      - PSPACE_DB_NAME=pspace
+      - PSPACE_DB_USER=pspace
+      - PSPACE_DB_PWD=pspace
+      - PSPACE_DB_HOST=pgdb
+      - PSPACE_DB_PORT=5432
     expose:
       - 8080
     depends_on:
