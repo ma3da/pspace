@@ -1,6 +1,6 @@
 from flask import request, send_from_directory
 from flask.json import jsonify
-from flask_login import UserMixin, login_required, login_user, logout_user
+from flask_login import UserMixin, login_required, login_user, logout_user, current_user
 from flaskr import app, DATA_FP, login_manager
 import flaskr.defi as defv
 
@@ -24,6 +24,11 @@ def login():
         login_user(User("0"))
         logged = True
     return jsonify({"logged": logged})
+
+@app.route("/logged", methods=["GET"])
+def logged():
+    print(current_user.is_authenticated)
+    return jsonify({"logged": current_user.is_authenticated})
 
 
 @app.route("/logout", methods=["POST"])
