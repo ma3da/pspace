@@ -1,0 +1,2 @@
+CREATE USER pspace WITH PASSWORD 'pspace';
+CREATE DATABASE pspace;
