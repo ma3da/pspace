@@ -31,6 +31,7 @@ except Exception as e:
     print("Using UserDummyDAO, no data to be read or written.")
     dao_users = f_user.UsersDummyDAO()
 
+# !!!!!!!!!!!!!!! DEV DEV DEV !!!!!!!!!!!!!!!
 dao_users.add_user("0", "0")
 
 
