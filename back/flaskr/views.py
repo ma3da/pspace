@@ -1,14 +1,14 @@
 from flask import request, send_from_directory
 from flask.json import jsonify
 from flask_login import login_required, login_user, logout_user, current_user
-from flaskr import app, user_dao, DATA_FP
+from flaskr import app, dao_users, DATA_FP
 import flaskr.defi as defv
 
 
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    _user = user_dao.get_auth(None, data.get("pwd", None))
+    _user = dao_users.get_auth("0", data.get("pwd", None))
     if _user is not None:
         login_user(_user)
     return jsonify({"logged": current_user.is_authenticated})

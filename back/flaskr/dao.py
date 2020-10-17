@@ -8,7 +8,7 @@ class DefinitionSrcDao:
         self.dbname = dbname
         self.table_name = table_name
         self.conn = psycopg2.connect(dbname=dbname, user=user, password=pwd,
-                                     host=host)
+                                     host=host, port=port)
 
     def get(self, word):
         """Returns the src for word if present, or None.
