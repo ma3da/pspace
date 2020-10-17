@@ -1,29 +1,18 @@
 from flask import request, send_from_directory
 from flask.json import jsonify
-from flask_login import UserMixin, login_required, login_user, logout_user, current_user
-from flaskr import app, DATA_FP, login_manager
+from flask_login import login_required, login_user, logout_user, current_user
+from flaskr import app, user_dao, DATA_FP
 import flaskr.defi as defv
-
-
-class User(UserMixin):
-    def __init__(self, _id):
-        self.id = _id
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    if user_id == "0": 
-        return User(user_id)
 
 
 @app.route("/login", methods=["POST"])
 def login():
-    logged = False
     data = request.get_json()
-    if data.get("pwd", None) == "0":
-        login_user(User("0"))
-        logged = True
-    return jsonify({"logged": logged})
+    _user = user_dao.get_auth(None, data.get("pwd", None))
+    if _user is not None:
+        login_user(_user)
+    return jsonify({"logged": current_user.is_authenticated})
+
 
 @app.route("/logged", methods=["GET"])
 def logged():
@@ -33,7 +22,7 @@ def logged():
 @app.route("/logout", methods=["POST"])
 def logout():
     logout_user()
-    return jsonify({"logged": False})
+    return jsonify({"logged": current_user.is_authenticated})
 
 
 @app.route("/")

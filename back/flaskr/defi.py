@@ -20,7 +20,6 @@ except Exception as e:  # e.g. connection issue
     if "dao_defsrc" in globals():
         dao_defsrc.close()
     print(e)
-    print(os.environ)
     print("Using a dummy DAO, no data to be read or written.")
     dao_defsrc = dao.DummyDao()
 
