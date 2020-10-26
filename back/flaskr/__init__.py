@@ -26,7 +26,7 @@ try:
     port = os.environ.get("PSPACE_DB_PORT", hs.DB_PORT)
 
     db_engine = sqlalchemy.create_engine(
-            f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
+        f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
 
     dao_users = f_user.UsersDAO(db_engine)
     dao_defsrc = dao.DefinitionSrcDao(db_engine)

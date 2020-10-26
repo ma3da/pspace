@@ -42,6 +42,12 @@ html, body, #root {
 .searchbar-info {
 }
 
+.info-item {
+  padding-left: .5em;
+  padding-right: .5em;
+
+}
+
 .searchbar-tools {
 }
 

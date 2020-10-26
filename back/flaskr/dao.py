@@ -1,5 +1,4 @@
-import sqlalchemy
-from sqlalchemy.sql import select, insert, update
+from sqlalchemy.sql import select
 from flaskr.tables import DEF_SRC
 
 
