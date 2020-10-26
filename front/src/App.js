@@ -3,7 +3,7 @@ import './App.css';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 function load(word, setRaw, setProcessed, setSource, setLogged) {
   let _word = word.trim();
@@ -90,7 +90,7 @@ function pusher(elem, setter) {
 
 function LogToggle(props) {
   const logged = props.logged ? props.logged.logged : false;
-  let value = logged ? "log out" : "log in";
+  let value = logged ? <FontAwesomeIcon icon={faSignOutAlt} /> : <FontAwesomeIcon icon={faSignInAlt} />
   let func = logged ? (() => logOut(props.setLogged)) : pusher(<Logging popclose={props.close} setLogged={props.setLogged} />, props.setQueue);
   return <button onClick={func}>{value}</button>;
 }
@@ -112,13 +112,15 @@ function App() {
   const [dataSource, setDataSrc] = useState("");
   const [process, setProcess] = useState(false); // == checkbox state at start?
   const [popQueue, setPopQueue] = useState([]);
-  const close = () => setPopQueue((prev) => {return prev.slice(1);});
   const [logged, setLogged] = useState(null); // {logged, username}
   const searchRef = useRef(null);
 
+  const close = () => setPopQueue((prev) => {return prev.slice(1);});
+  const _load = () => load(word, setDefRawHtml, setDefProcessed, setDataSrc, setLogged);
+
   if (logged === null) updateLogged(setLogged);
   useEffect(() => {if (popQueue.length === 0) searchRef.current.focus();});
-  const infoLogged = logged && logged.logged ? <span className="info-item">logged as: {logged.username}</span> : <span></span>;
+  const spanUserInfo = logged && logged.logged ? <span className="info-item">logged as: {logged.username}</span> : null;
 
   return (
   <div id="definition-main">
@@ -133,7 +135,7 @@ function App() {
         <span>
         <LogToggle setQueue={setPopQueue} logged={logged} setLogged={setLogged} close={close}/>
         </span>
-        {infoLogged}
+        {spanUserInfo}
         <span className="info-item">source: {dataSource}</span>
       </div>
       <div className="searchbar-tools">
@@ -141,7 +143,7 @@ function App() {
           <label>
           <input type="checkbox" onChange={e => setProcess(e.target.checked)} />slim</label>
           <input onChange={e => setWord(e.target.value)} ref={searchRef} />
-          <button onClick={() => load(word, setDefRawHtml, setDefProcessed, setDataSrc, setLogged)}><FontAwesomeIcon icon={faSearch} color="black" /></button>
+          <button onClick={_load}><FontAwesomeIcon icon={faSearch} /></button>
         </form>
       </div>
     </div>

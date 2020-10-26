@@ -39,7 +39,9 @@ html, body, #root {
   color: black;
 }
 
-.searchbar-info {
+.searchbar [type="checkbox"]
+{
+    vertical-align:middle;
 }
 
 .info-item {
@@ -47,17 +49,6 @@ html, body, #root {
   padding-right: .5em;
 
 }
-
-.searchbar-tools {
-}
-
-/* .searchbar button { */
-/*   background-color: lightgrey; */
-/*   color: black; */
-/*   border: 0; */
-/*   box-shadow: none; */
-/*   padding: .5em; */
-/* } */
 
 .pop-container {
   position: absolute;
