@@ -1,4 +1,13 @@
-import psycopg2
+import sqlalchemy
+from sqlalchemy.sql import select, insert, update
+from sqlalchemy import Table, Column, String, MetaData
+
+metadata = MetaData()
+
+DEF_SRC = Table("definition_sources", metadata,
+    Column("word", String, primary_key=True),
+    Column("src", String),
+)
 
 
 class DefinitionSrcDao:
@@ -7,39 +16,36 @@ class DefinitionSrcDao:
     def __init__(self, dbname, user, pwd, host=None, port=None, table_name="definition_sources"):
         self.dbname = dbname
         self.table_name = table_name
-        self.conn = psycopg2.connect(dbname=dbname, user=user, password=pwd,
-                                     host=host, port=port)
+        self.engine = sqlalchemy.create_engine(
+            f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
 
     def get(self, word):
         """Returns the src for word if present, or None.
 
         Error if more than one record found.
         """
-        with self.conn as conn:
-            with conn.cursor() as cur:
-                cur.execute(f"select * from {self.table_name} where word = %s",
-                            (word, ))
-                fetched = cur.fetchall()
-        if len(fetched) > 1:
-            raise ValueError(f"Expected to fetch <= 1 record for word {word}, "
-                             "but got {len(fetched)}. Ids: "
-                             "{list(map(operator.itemgetter(0), fetched))}")
-        return fetched[0][1] if fetched else None
+        with self.engine.connect() as conn:
+            s = select([DEF_SRC.c.src]).where(DEF_SRC.c.word == word)
+            result = conn.execute(s)
+            row = result.fetchone()
+            if row is not None:
+                return row[0]
 
     def write(self, word, src) -> None:
         """Writes a record for word, overwriting if it already exists.
         """
         fetched = self.get(word)
-        with self.conn as conn:
+        with self.engine.connect() as conn:
             if fetched is None:
-                with conn.cursor() as cur:
-                    cur.execute(f"insert into {self.table_name} (word, src) values (%s, %s);", (word, src))
+                s = DEF_SRC.insert().values(word=word, src=src)
             else:
-                with conn.cursor() as cur:
-                    cur.execute(f"update {self.table_name} set src = %s where word = %s);", (src, word))
+                s = (DEF_SRC.update()
+                     .where(DEF_SRC.c.word == word)
+                     .values(word=word, src=src))
+            conn.execute(s)
 
     def close(self):
-        self.conn.close()
+        self.engine.dispose()
 
 
 class DummyDao:
