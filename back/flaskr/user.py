@@ -15,10 +15,8 @@ class User(flask_login.UserMixin):
 
 
 class UsersDAO:
-    def __init__(self, dbname, user, pwd, host=None, port=None):
-        self.dbname = dbname
-        self.engine = sqlalchemy.create_engine(
-            f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
+    def __init__(self, engine):
+        self.engine = engine
 
     def get(self, uid):
         with self.engine.connect() as conn:
@@ -53,9 +51,6 @@ class UsersDAO:
             s = USERS.delete().where(USERS.c.uid == uid)
             conn.execute(s)
 
-    def close(self):
-        self.engine.dispose()
-
 
 class UsersDummyDAO:
     def get(self, uid):
@@ -71,6 +66,3 @@ class UsersDummyDAO:
 
     def del_user(self, uid):
         return 0
-
-    def close(self):
-        pass

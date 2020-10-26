@@ -6,10 +6,8 @@ from flaskr.tables import DEF_SRC
 class DefinitionSrcDao:
     """ Record structure: (word, src) """
 
-    def __init__(self, dbname, user, pwd, host=None, port=None):
-        self.dbname = dbname
-        self.engine = sqlalchemy.create_engine(
-            f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
+    def __init__(self, engine):
+        self.engine = engine
 
     def get(self, word):
         """Returns the src for word if present, or None.
@@ -36,16 +34,10 @@ class DefinitionSrcDao:
                      .values(word=word, src=src))
             conn.execute(s)
 
-    def close(self):
-        self.engine.dispose()
-
 
 class DummyDao:
     def get(self, *a, **ka):
         return None
 
     def write(self, *a, **ka):
-        pass
-
-    def close(self):
         pass
