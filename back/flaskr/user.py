@@ -1,4 +1,6 @@
-import psycopg2
+from sqlalchemy.sql import select, insert, update
+import sqlalchemy.exc
+from flaskr.tables import USERS
 import flask_login
 import hashlib
 
@@ -13,47 +15,46 @@ class User(flask_login.UserMixin):
 
 
 class UsersDAO:
-    def __init__(self, dbname, user, pwd, host=None, port=None, table_name="users"):
+    def __init__(self, dbname, user, pwd, host=None, port=None):
         self.dbname = dbname
-        self.table_name = table_name
-        self.conn = psycopg2.connect(dbname=dbname, user=user, password=pwd,
-                                     host=host, port=port)
+        self.engine = sqlalchemy.create_engine(
+            f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
 
     def get(self, uid):
-        with self.conn as conn:
-            with conn.cursor() as cur:
-                cur.execute(f"select * from {self.table_name} where uid = %s",
-                            (uid, ))
-                fetched = cur.fetchall()
-        if fetched:
-            uid, pwdh = fetched[0]
+        with self.engine.connect() as conn:
+            s = select([USERS]).where(USERS.c.uid == uid)
+            result = conn.execute(s)
+            row = result.fetchone()
+        if row is not None:
+            uid, pwdh = row
             return User(uid)
 
     def get_auth(self, uid, pwd):
-        with self.conn as conn:
-            with conn.cursor() as cur:
-                cur.execute(f"select * from {self.table_name} where uid = %s and password = %s",
-                            (uid, HASH(pwd)))
-                fetched = cur.fetchall()
-        if fetched:
-            uid, pwdh = fetched[0]
+        with self.engine.connect() as conn:
+            s = (select([USERS])
+                 .where(USERS.c.uid == uid)
+                 .where(USERS.c.password == HASH(pwd)))
+            result = conn.execute(s)
+            row = result.fetchone()
+        if row is not None:
+            uid, pwdh = row
             return User(uid)
 
     def add_user(self, uid, pwd):
         try:
-            with self.conn as conn:
-                with conn.cursor() as cur:
-                    return cur.execute(f"insert into {self.table_name} values (%s, %s);", (uid, HASH(pwd)))
-        except psycopg2.errors.UniqueViolation:
+            with self.engine.connect() as conn:
+                s = USERS.insert().values(uid=uid, password=HASH(pwd))
+                conn.execute(s)
+        except sqlalchemy.exc.IntegrityError:
             pass
 
     def del_user(self, uid):
-        with self.conn as conn:
-            with conn.cursor() as cur:
-                return cur.execute(f"delete from {self.table_name} where uid = %s;", (uid, ))
+        with self.engine.connect() as conn:
+            s = USERS.delete().where(USERS.c.uid == uid)
+            conn.execute(s)
 
     def close(self):
-        self.conn.close()
+        self.engine.dispose()
 
 
 class UsersDummyDAO:

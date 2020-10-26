@@ -1,21 +1,13 @@
 import sqlalchemy
 from sqlalchemy.sql import select, insert, update
-from sqlalchemy import Table, Column, String, MetaData
-
-metadata = MetaData()
-
-DEF_SRC = Table("definition_sources", metadata,
-    Column("word", String, primary_key=True),
-    Column("src", String),
-)
+from flaskr.tables import DEF_SRC
 
 
 class DefinitionSrcDao:
     """ Record structure: (word, src) """
 
-    def __init__(self, dbname, user, pwd, host=None, port=None, table_name="definition_sources"):
+    def __init__(self, dbname, user, pwd, host=None, port=None):
         self.dbname = dbname
-        self.table_name = table_name
         self.engine = sqlalchemy.create_engine(
             f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
 
