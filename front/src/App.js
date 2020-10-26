@@ -2,28 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
-function load(word, process, htmlSetter, srcSetter, setLogged) {
+function load(word, setRaw, setProcessed, setSource, setLogged) {
   let _word = word.trim();
   if (_word !== "") {
     axios
-      .post("/api/" + _word, 
-               {"process": process},
-               {headers: {"X-CSRFToken": Cookies.get("csrftoken")}})
+      .get("/api/" + _word)
       .then(resp => {
-          htmlSetter(resp.data.htmlcontent);
-          srcSetter(resp.data.datasource);
+          setRaw(resp.data.htmlcontent);
+          setProcessed(resp.data.processed);
+          setSource(resp.data.datasource);
       })
       .catch(err => {
 				console.log(err);
-				htmlSetter("Could not fetch definition.");
-				srcSetter("?");
+				setRaw("Could not fetch raw definition.");
+				setProcessed("Could not fetch slim definition.");
+				setSource("?");
 				updateLogged(setLogged);
       });
   } else {
-    htmlSetter("what word is this: '" + word + "'?");
+    setRaw("what word is this: '" + word + "'?");
+    setProcessed("what word is this: '" + word + "'?");
   }
 }
 
@@ -93,9 +94,20 @@ function LogToggle(props) {
   return <button onClick={func}>{value}</button>;
 }
 
+function processDefinition(def) {
+    console.log(def);
+    return <div dangerouslySetInnerHTML={{__html: def}} />;
+}
+
+function Definition(props){
+    return props.process ? processDefinition(props.processed)
+        : <div dangerouslySetInnerHTML={{__html: props.raw}} />;
+}
+
 function App() {
   const [word, setWord] = useState("");
-  const [definitionHtml, setDefHtml] = useState("");
+  const [defRawHtml, setDefRawHtml] = useState("");
+  const [defProcessed, setDefProcessed] = useState({});
   const [dataSource, setDataSrc] = useState("");
   const [process, setProcess] = useState(false); // == checkbox state at start?
 	const [popQueue, setPopQueue] = useState([]);
@@ -108,7 +120,7 @@ function App() {
   <div id="definition-main">
     <div className="definition-center">
       <div className="definition-content centering">
-        <div dangerouslySetInnerHTML={{__html: definitionHtml}} />
+          <Definition process={process} processed={defProcessed} raw={defRawHtml}/>
       </div>
     </div>
 
@@ -122,7 +134,7 @@ function App() {
 					<label>
 					<input type="checkbox" onChange={e => setProcess(e.target.checked)} />slim</label>
 					<input onChange={e => setWord(e.target.value)} ref={searchRef} />
-					<button onClick={() => load(word, process, setDefHtml, setDataSrc, setLogged)}><FontAwesomeIcon icon={faSearch} color="black" /></button>
+					<button onClick={() => load(word, setDefRawHtml, setDefProcessed, setDataSrc, setLogged)}><FontAwesomeIcon icon={faSearch} color="black" /></button>
 				</form>
       </div>
     </div>

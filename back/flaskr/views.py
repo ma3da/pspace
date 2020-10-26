@@ -30,14 +30,12 @@ def index():
     return send_from_directory(DATA_FP, "index.html")
 
 
-@app.route("/api/<word>", methods=["POST"])
+@app.route("/api/<word>", methods=["GET"])
 @login_required
 def serve(word):
-    data = request.get_json()
-    process_func = (defv.process_article_src if data.get("process", False)
-                    else defv.process_article_src_dummy)
-    html_content, data_src = "No definition found.", None
+    raw, processed, data_src = "No raw definition found.", "No processed definition found.", None
     if defv.check_input(word):
         word = word.strip()
-        html_content, data_src = defv.get_definition_html(word, process_func)
-    return {"htmlcontent": html_content, "datasource": data_src}
+        raw, data_src = defv.get_definition_html(word, defv.to_raw_html)
+        processed, _ = defv.get_definition_html(word, defv.process_article_src)
+    return {"htmlcontent": raw, "processed": processed, "datasource": data_src}

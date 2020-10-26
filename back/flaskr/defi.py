@@ -38,7 +38,7 @@ def has_class(tag, class_name):
     return isinstance(tag, bs4.element.Tag) and tag.has_attr("class") and class_name in tag["class"]
 
 
-def process_article_src_dummy(html):
+def to_raw_html(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
     article = soup.find("div", id=re.compile("^art"))
     return "<br>".join(map(str, article)) if article else ""
