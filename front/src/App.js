@@ -11,14 +11,16 @@ function load(word, setRaw, setProcessed, setSource, setLogged) {
     axios
       .get("/api/" + _word)
       .then(resp => {
-          setRaw(resp.data.htmlcontent ? resp.data.htmlcontent : "Could not fetch raw definition.");
-          setProcessed(resp.data.processed ? resp.data.processed : "Could not fetch slim definition.");
+          setRaw(resp.data.htmlcontent);
+          setProcessed(resp.data.processed);
           setSource(resp.data.datasource ? resp.data.datasource : "unk");
       })
       .catch(err => {
         console.log(err);
-        setRaw("Could not fetch raw definition.");
-        setProcessed("Could not fetch slim definition.");
+        // setRaw("Could not fetch raw definition.");
+        // setProcessed("Could not fetch slim definition.");
+        setRaw(null);
+        setProcessed(null);
         setSource("?");
         updateLogged(setLogged);
       });
@@ -107,19 +109,21 @@ function LogToggle(props) {
   return <button onClick={func}>{value}</button>;
 }
 
-function processDefinition(def) {
-    console.log(def);
-    return <div dangerouslySetInnerHTML={{__html: def}} />;
-}
-
 function WordList(props){
     const words = props.wordlist.map((word) => <div className="wordlist-item" onClick={() => props.load(word)}>{word}</div>);
     return words ? <div className="wordlist"> {words} </div> : null;
 }
 
+function processDefinition(def) {
+    return def ? <div className="definition" dangerouslySetInnerHTML={{__html: def}} />
+               : <div className="definition">Could not fetch slim definition.</div>;
+}
+
 function Definition(props){
-    return props.process ? processDefinition(props.processed)
-        : <div className="definition" dangerouslySetInnerHTML={{__html: props.raw}} />;
+    if (props.process) return processDefinition(props.processed);
+
+    return props.raw ? <div className="definition" dangerouslySetInnerHTML={{__html: props.raw}} />
+                     : <div className="definition">Could not fetch raw definition.</div>;
 }
 
 function ShowToggle(props){
@@ -133,7 +137,7 @@ function ShowToggle(props){
 function App() {
   const [word, setWord] = useState("");
   const [defRawHtml, setDefRawHtml] = useState("");
-  const [defProcessed, setDefProcessed] = useState({});
+  const [defProcessed, setDefProcessed] = useState("");
   const [wordList, setWordList] = useState([]);
   const [dataSource, setDataSrc] = useState("");
   const [process, setProcess] = useState(false); // == checkbox state at start?
