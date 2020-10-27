@@ -14,7 +14,7 @@ class DefinitionSrcDao:
 
         Error if more than one record found.
         """
-        cache_result = self.cache.get(word)
+        cache_result = self.cache.get_src(word)
         if cache_result is not None:
             return cache_result.decode("utf8")
 
@@ -23,7 +23,7 @@ class DefinitionSrcDao:
             result = conn.execute(s)
             row = result.fetchone()
             if row is not None:
-                self.cache.set(word, row[0].encode("utf8"))
+                self.cache.set_src(word, row[0])
                 return row[0]
 
     def iter_words(self, limit=None):
