@@ -1,8 +1,8 @@
 from sqlalchemy.sql import select
-from flaskr.tables import DEF_SRC
+from .tables import DEF_SRC
 
 
-class DefinitionSrcDao:
+class DefinitionSrcDAO:
     """ Record structure: (word, src) """
 
     def __init__(self, engine, cache):
@@ -52,7 +52,7 @@ class DefinitionSrcDao:
             conn.execute(s)
 
 
-class DummyDao:
+class DefinitionSrcDummyDAO:
     def get(self, *a, **ka):
         return None
 

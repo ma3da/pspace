@@ -42,15 +42,25 @@ def send_words():
 @app.route("/api/<word>", methods=["GET"])
 @login_required
 def serve(word):
-    data_src = "cache"
+    raw, processed, datasource = None, None, None
     if defv.check_input(word):
+        datasources = []
         word = word.strip()
+
         raw = dao_defsrc.cache.get_raw(word)
         if raw is None:
-            raw, data_src = defv.get_definition_html(word, defv.to_raw_html)
+            raw, _ds = defv.get_definition_html(word, defv.to_raw_html)
+            datasources.append(_ds)
             dao_defsrc.cache.set_raw(word, raw)
         processed = dao_defsrc.cache.get_processed(word)
         if processed is None:
-            processed, data_src = defv.get_definition_html(word, defv.process_article_src)
+            processed, _ds = defv.get_definition_html(word, defv.process_article_src)
+            datasources.append(_ds)
             dao_defsrc.cache.set_processed(word, processed)
-    return {"htmlcontent": raw, "processed": processed, "datasource": data_src}
+
+        if not datasources:
+            datasource = "cache"
+        else: # local or remote
+            datasource = sorted(datasources, reverse=True)[0]
+
+    return jsonify({"htmlcontent": raw, "processed": processed, "datasource": datasource})
