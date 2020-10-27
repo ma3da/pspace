@@ -21,8 +21,8 @@ login_manager.init_app(app)
 try:
     import flaskr.nocommit.hiddensettings as hs
 
-    host = os.environ.get("PSPACE_BROKER_HOST", hs.CACHE_HOST)
-    port = os.environ.get("PSPACE_BROKER_PORT", hs.CACHE_PORT)
+    host = os.environ.get("PSPACE_CACHE_HOST", hs.CACHE_HOST)
+    port = os.environ.get("PSPACE_CACHE_PORT", hs.CACHE_PORT)
     redis_client = redis.Redis(host=host, port=port)
 
     dbname = os.environ.get("PSPACE_DB_NAME", hs.DB_NAME)

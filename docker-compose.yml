@@ -13,11 +13,16 @@ services:
       - PSPACE_DB_PWD=pspace
       - PSPACE_DB_HOST=pgdb
       - PSPACE_DB_PORT=5432
+      - PSPACE_CACHE_HOST=redis
+      - PSPACE_CACHE_PORT=6379
     expose:
       - 8080
     depends_on:
       - pgdb
-    command: ["./wait-for-it.sh", "pgdb:5432", "--", "uwsgi", "app.ini"]
+      - redis
+    command: ["./wait-for-it.sh", "pgdb:5432",
+              "--", "./wait-for-it.sh", "redis:6379",
+              "--", "uwsgi", "app.ini"]
 
   nginx:
     build: ./nginx
@@ -36,6 +41,13 @@ services:
       - 5432
     volumes:
       - "testy_pgdata:/var/lib/postgresql/data"
+
+  redis:
+    image: redis:6.0.8
+    container_name: redisy
+    restart: always
+    expose:
+      - 6379
 
 volumes:
   testy_pgdata:
