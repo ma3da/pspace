@@ -5,19 +5,25 @@ from flaskr.tables import DEF_SRC
 class DefinitionSrcDao:
     """ Record structure: (word, src) """
 
-    def __init__(self, engine):
+    def __init__(self, engine, cache):
         self.engine = engine
+        self.cache = cache
 
     def get(self, word):
         """Returns the src for word if present, or None.
 
         Error if more than one record found.
         """
+        cache_result = self.cache.get(word)
+        if cache_result is not None:
+            return cache_result.decode("utf8")
+
         with self.engine.connect() as conn:
             s = select([DEF_SRC.c.src]).where(DEF_SRC.c.word == word)
             result = conn.execute(s)
             row = result.fetchone()
             if row is not None:
+                self.cache.set(word, row[0].encode("utf8"))
                 return row[0]
 
     def write(self, word, src) -> None:

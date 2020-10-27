@@ -4,6 +4,7 @@ import os
 import flaskr.dao as dao
 import flaskr.user as f_user
 import sqlalchemy
+import redis
 
 
 BASE_FP = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -19,6 +20,11 @@ login_manager.init_app(app)
 
 try:
     import flaskr.nocommit.hiddensettings as hs
+
+    host = os.environ.get("PSPACE_BROKER_HOST", hs.CACHE_HOST)
+    port = os.environ.get("PSPACE_BROKER_PORT", hs.CACHE_PORT)
+    redis_client = redis.Redis(host=host, port=port)
+
     dbname = os.environ.get("PSPACE_DB_NAME", hs.DB_NAME)
     user = os.environ.get("PSPACE_DB_USER", hs.DB_USER)
     pwd = os.environ.get("PSPACE_DB_PWD", hs.DB_PWD)
@@ -29,9 +35,12 @@ try:
         f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
 
     dao_users = f_user.UsersDAO(db_engine)
-    dao_defsrc = dao.DefinitionSrcDao(db_engine)
+    dao_defsrc = dao.DefinitionSrcDao(db_engine, redis_client)
 except Exception as e:
-    db_engine.dispose()
+    if "db_engine" in globals():
+        db_engine.dispose()
+    if "redis_client" in globals():
+        redis_client.close()
     print(e)
     print("Using dummy daos, no data to be read or written.")
     dao_users = f_user.UsersDummyDAO()
