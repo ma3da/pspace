@@ -42,9 +42,15 @@ def send_words():
 @app.route("/api/<word>", methods=["GET"])
 @login_required
 def serve(word):
-    raw, processed, data_src = "No raw definition found.", "No processed definition found.", None
+    data_src = "cache"
     if defv.check_input(word):
         word = word.strip()
-        raw, data_src = defv.get_definition_html(word, defv.to_raw_html)
-        processed, _ = defv.get_definition_html(word, defv.process_article_src)
+        raw = dao_defsrc.cache.get_raw(word)
+        if raw is None:
+            raw, data_src = defv.get_definition_html(word, defv.to_raw_html)
+            dao_defsrc.cache.set_raw(word, raw)
+        processed = dao_defsrc.cache.get_processed(word)
+        if processed is None:
+            processed, data_src = defv.get_definition_html(word, defv.process_article_src)
+            dao_defsrc.cache.set_processed(word, processed)
     return {"htmlcontent": raw, "processed": processed, "datasource": data_src}

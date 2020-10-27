@@ -11,9 +11,9 @@ function load(word, setRaw, setProcessed, setSource, setLogged) {
     axios
       .get("/api/" + _word)
       .then(resp => {
-          setRaw(resp.data.htmlcontent);
-          setProcessed(resp.data.processed);
-          setSource(resp.data.datasource);
+          setRaw(resp.data.htmlcontent ? resp.data.htmlcontent : "Could not fetch raw definition.");
+          setProcessed(resp.data.processed ? resp.data.processed : "Could not fetch slim definition.");
+          setSource(resp.data.datasource ? resp.data.datasource : "unk");
       })
       .catch(err => {
         console.log(err);

@@ -22,6 +22,7 @@ login_manager.init_app(app)
 class Cache:
     key_src = "src"
     key_processed = "proc"
+    key_raw = "raw"
 
     def __init__(self, client):
         self.client = client
@@ -29,6 +30,8 @@ class Cache:
     def _get(self, hsh, key):
         r = self.client.hget(hsh, key)
         if r is not None:
+            if isinstance(r, bytes):
+                r = r.decode("utf8")
             return r
 
     def _set(self, hsh, key, val):
@@ -46,6 +49,11 @@ class Cache:
     def set_processed(self, word, processed):
         return self._set(word, self.key_processed, processed)
 
+    def get_raw(self, word):
+        return self._get(word, self.key_raw)
+
+    def set_raw(self, word, raw):
+        return self._set(word, self.key_raw, raw)
 
 try:
     import flaskr.nocommit.hiddensettings as hs

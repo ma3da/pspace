@@ -14,9 +14,9 @@ class DefinitionSrcDao:
 
         Error if more than one record found.
         """
-        cache_result = self.cache.get_src(word)
-        if cache_result is not None:
-            return cache_result.decode("utf8")
+        cached = self.cache.get_src(word)
+        if cached is not None:
+            return cached
 
         with self.engine.connect() as conn:
             s = select([DEF_SRC.c.src]).where(DEF_SRC.c.word == word)
