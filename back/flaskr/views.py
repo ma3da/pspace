@@ -1,7 +1,7 @@
 from flask import request, send_from_directory
 from flask.json import jsonify
 from flask_login import login_required, login_user, logout_user, current_user
-from flaskr import app, dao_users, DATA_FP
+from flaskr import app, dao_users, dao_defsrc, DATA_FP
 import flaskr.defi as defv
 
 
@@ -32,6 +32,11 @@ def logout():
 @app.route("/")
 def index():
     return send_from_directory(DATA_FP, "index.html")
+
+@app.route("/api/words", methods=["GET"])
+@login_required
+def send_words():
+    return jsonify(list(dao_defsrc.iter_words(limit=20)))
 
 
 @app.route("/api/<word>", methods=["GET"])

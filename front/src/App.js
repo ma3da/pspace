@@ -28,6 +28,18 @@ function load(word, setRaw, setProcessed, setSource, setLogged) {
   }
 }
 
+function loadWords(setWordList, setLogged){
+    axios
+        .get("/api/words")
+        .then(resp => {
+            setWordList(resp.data);
+        })
+        .catch(err => {
+            console.log(err);
+            updateLogged(setLogged);
+        });
+}
+
 function updateLogged(setLogged) {
   axios.get("/logged")
        .then(resp => {setLogged(resp.data);})
@@ -90,7 +102,7 @@ function pusher(elem, setter) {
 
 function LogToggle(props) {
   const logged = props.logged ? props.logged.logged : false;
-  let value = logged ? <FontAwesomeIcon icon={faSignOutAlt} /> : <FontAwesomeIcon icon={faSignInAlt} />
+  let value = logged ? <FontAwesomeIcon icon={faSignOutAlt} /> : <FontAwesomeIcon icon={faSignInAlt} />;
   let func = logged ? (() => logOut(props.setLogged)) : pusher(<Logging popclose={props.close} setLogged={props.setLogged} />, props.setQueue);
   return <button onClick={func}>{value}</button>;
 }
@@ -100,15 +112,29 @@ function processDefinition(def) {
     return <div dangerouslySetInnerHTML={{__html: def}} />;
 }
 
+function WordList(props){
+    const words = props.wordlist.map((word) => <div><a href="#" onClick={() => props.load(word)}>{word}</a></div>);
+    return words ? <div> {words} </div> : null;
+}
+
 function Definition(props){
     return props.process ? processDefinition(props.processed)
         : <div dangerouslySetInnerHTML={{__html: props.raw}} />;
+}
+
+function ShowToggle(props){
+    const [show, setShow] = useState(true);
+    const _show = () => {props.load(); setShow(false);};
+    const _hide = () => {props.unload(); setShow(true);};
+    return show ? <button onClick={_show}>show</button>
+                : <button onClick={_hide}>hide</button>;
 }
 
 function App() {
   const [word, setWord] = useState("");
   const [defRawHtml, setDefRawHtml] = useState("");
   const [defProcessed, setDefProcessed] = useState({});
+  const [wordList, setWordList] = useState([]);
   const [dataSource, setDataSrc] = useState("");
   const [process, setProcess] = useState(false); // == checkbox state at start?
   const [popQueue, setPopQueue] = useState([]);
@@ -117,6 +143,8 @@ function App() {
 
   const close = () => setPopQueue((prev) => {return prev.slice(1);});
   const _load = () => load(word, setDefRawHtml, setDefProcessed, setDataSrc, setLogged);
+  const _load2 = (word) => load(word, setDefRawHtml, setDefProcessed, setDataSrc, setLogged);
+  const _loadWords = () => loadWords(setWordList, setLogged);
 
   if (logged === null) updateLogged(setLogged);
   useEffect(() => {if (popQueue.length === 0) searchRef.current.focus();});
@@ -126,18 +154,20 @@ function App() {
   <div id="definition-main">
     <div className="definition-center">
       <div className="definition-content centering">
-          <Definition process={process} processed={defProcessed} raw={defRawHtml}/>
+          <WordList wordlist={wordList} load={_load2} />
+          <Definition process={process} processed={defProcessed} raw={defRawHtml} />
       </div>
     </div>
 
     <div className="searchbar">
       <div className="searchbar-info">
         <span>
-        <LogToggle setQueue={setPopQueue} logged={logged} setLogged={setLogged} close={close}/>
+        <LogToggle setQueue={setPopQueue} logged={logged} setLogged={setLogged} close={close} />
         </span>
         {spanUserInfo}
         <span className="info-item">source: {dataSource}</span>
       </div>
+          <ShowToggle load={_loadWords} unload={() => setWordList([])} />
       <div className="searchbar-tools">
         <form action="javascript:void(0);">
           <label>

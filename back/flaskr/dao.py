@@ -26,6 +26,18 @@ class DefinitionSrcDao:
                 self.cache.set(word, row[0].encode("utf8"))
                 return row[0]
 
+    def iter_words(self, limit=None):
+        """Iterates over the words already saved.
+        :limit: Stop iterating after `limit` words.
+        """
+        with self.engine.connect() as conn:
+            s = select([DEF_SRC.c.word])
+            if limit:
+                s = s.limit(limit)
+            result = conn.execute(s)
+            for row in result:
+                yield row[0]  # conn management..?
+
     def write(self, word, src) -> None:
         """Writes a record for word, overwriting if it already exists.
         """
