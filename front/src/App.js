@@ -113,13 +113,13 @@ function processDefinition(def) {
 }
 
 function WordList(props){
-    const words = props.wordlist.map((word) => <div><a href="#" onClick={() => props.load(word)}>{word}</a></div>);
-    return words ? <div> {words} </div> : null;
+    const words = props.wordlist.map((word) => <div className="wordlist-item" onClick={() => props.load(word)}>{word}</div>);
+    return words ? <div className="wordlist"> {words} </div> : null;
 }
 
 function Definition(props){
     return props.process ? processDefinition(props.processed)
-        : <div dangerouslySetInnerHTML={{__html: props.raw}} />;
+        : <div className="definition" dangerouslySetInnerHTML={{__html: props.raw}} />;
 }
 
 function ShowToggle(props){

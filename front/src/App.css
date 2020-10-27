@@ -23,10 +23,25 @@ html, body, #root {
 
 .definition-content {
     max-width: 80ch;
-    padding-top: 2em;
     padding-bottom:40vh;
     padding-left: 1ch;
     padding-right: 1ch;
+}
+
+.definition {
+    padding-top: 2em;
+}
+
+.wordlist {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    color: grey;
+}
+
+.wordlist-item {
+    padding: .8em;
+    cursor: pointer;
 }
 
 .searchbar {
