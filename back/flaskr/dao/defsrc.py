@@ -1,5 +1,6 @@
 from sqlalchemy.sql import select
 from .tables import DEF_SRC
+from .util import do_nothing
 
 
 class DefinitionSrcDAO:
@@ -53,8 +54,7 @@ class DefinitionSrcDAO:
 
 
 class DefinitionSrcDummyDAO:
-    def get(self, *a, **ka):
-        return None
-
-    def write(self, *a, **ka):
-        pass
+    def __init__(self, cache):
+        self.cache = cache
+        self.get = do_nothing
+        self.write = do_nothing

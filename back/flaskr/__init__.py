@@ -25,6 +25,15 @@ try:
     port = os.environ.get("PSPACE_CACHE_PORT", hs.CACHE_PORT)
     redis_client = redis.Redis(host=host, port=port)
     cache = dao.Cache(redis_client)
+except Exception as e:
+    if "redis_client" in globals():
+        redis_client.close()
+    print(e)
+    print("Using dummy daos, no data to be read or written.")
+    cache = dao.DummyCache()
+
+try:
+    import flaskr.nocommit.hiddensettings as hs
 
     dbname = os.environ.get("PSPACE_DB_NAME", hs.DB_NAME)
     user = os.environ.get("PSPACE_DB_USER", hs.DB_USER)
@@ -40,12 +49,10 @@ try:
 except Exception as e:
     if "db_engine" in globals():
         db_engine.dispose()
-    if "redis_client" in globals():
-        redis_client.close()
     print(e)
     print("Using dummy daos, no data to be read or written.")
     dao_users = dao.UsersDummyDAO(User)
-    dao_defsrc = dao.DefinitionSrcDummyDAO
+    dao_defsrc = dao.DefinitionSrcDummyDAO(cache)
 
 # !!!!!!!!!!!!!!! DEV DEV DEV !!!!!!!!!!!!!!!
 dao_users.add_user("0", "0")

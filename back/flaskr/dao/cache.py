@@ -1,3 +1,5 @@
+from .util import do_nothing
+
 class Cache:
     key_src = "src"
     key_processed = "proc"
@@ -33,3 +35,11 @@ class Cache:
 
     def set_raw(self, word, raw):
         return self._set(word, self.key_raw, raw)
+
+
+class DummyCache:
+    def __init__(self):
+        for key in ("src", "processed", "raw"):
+            setattr(self, f"get_{key}", do_nothing)
+            setattr(self, f"set_{key}", do_nothing)
+
