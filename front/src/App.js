@@ -74,13 +74,13 @@ function Logging(props) {
   const uidRef = useRef(null);
   useEffect(() => {if (!uid && !pwd) uidRef.current.focus();});
   return (
-          <form action="javascript:void(0);">
-    <div id="logging">
+    <form action="javascript:void(0);" autocomplete="off">
+      <div id="logging">
         <input name="uid" onChange={e => setUid(e.target.value)} ref={uidRef} />
         <input type="password" name="pwd" onChange={e => setPwd(e.target.value)} />
-          <button onClick={() => {logIn(uid, pwd, props.setLogged); props.popclose();}}>log in</button>
-    </div>
-          </form>
+        <button onClick={() => {logIn(uid, pwd, props.setLogged); props.popclose();}}>log in</button>
+      </div>
+    </form>
   );
 }
 
