@@ -3,6 +3,10 @@ from flask.json import jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 from flaskr import app, dao_users, dao_defsrc
 import flaskr.defi as defv
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 @app.route("/login", methods=["POST"])
@@ -68,5 +72,7 @@ def serve(word):
 @login_required
 def createuser(u, p):
     if dao_users.add_user(u, p):
+        logger.debug(f"creating user {u}: success")
         return f"Hello, {u}"
+    logger.debug(f"creating user {u}: failure")
     return ""

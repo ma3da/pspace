@@ -5,8 +5,17 @@ import flaskr.dao as dao
 from flaskr.user import User
 import sqlalchemy
 import redis
+import logging
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(__file__)), "back.log"))
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
+logger.info("starting...")
 login_manager = flask_login.LoginManager()
 app = flask.Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -18,8 +27,8 @@ try:
 except Exception as e:
     if "redis_client" in globals():
         redis_client.close()
-    print(e)
-    print("Using dummy cache...")
+    logger.info(e)
+    logger.info("Using dummy cache...")
     cache = dao.DummyCache()
 
 try:
@@ -34,8 +43,8 @@ try:
 except Exception as e:
     if "db_engine" in globals():
         db_engine.dispose()
-    print(e)
-    print("Using dummy daos, no data to be read or written...")
+    logger.info(e)
+    logger.info("Using dummy daos, no data to be read or written...")
     dao_users = dao.UsersDummyDAO(User)
     dao_defsrc = dao.DefinitionSrcDummyDAO(cache)
 

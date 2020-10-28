@@ -2,6 +2,7 @@ from sqlalchemy.sql import select, insert, update
 import sqlalchemy.exc
 from .tables import USERS
 import hashlib
+from .util import do_nothing
 
 
 def HASH(s):
@@ -48,19 +49,10 @@ class UsersDAO:
 
 
 class UsersDummyDAO:
-    def __init__(self, user_class):
-        self.user_class = user_class
+    def __init__(self, *args, **kwargs):
+        pass
 
-    def get(self, uid):
-        if uid == "0":
-            return self.user_class("0")
-
-    def get_auth(self, uid, pwd):
-        if uid == "0" and pwd == "0":
-            return self.user_class("0")
-
-    def add_user(self, uid, pwd):
-        return 0
-
-    def del_user(self, uid):
-        return 0
+    get = do_nothing
+    get_auth = do_nothing
+    add_user = do_nothing
+    del_user = do_nothing
