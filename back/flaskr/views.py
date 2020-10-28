@@ -1,14 +1,16 @@
 from flask import request, send_from_directory
 from flask.json import jsonify
 from flask_login import login_required, login_user, logout_user, current_user
-from flaskr import app, dao_users, dao_defsrc, DATA_FP
+from flaskr import app, dao_users, dao_defsrc
 import flaskr.defi as defv
 
 
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    _user = dao_users.get_auth("0", data.get("pwd", None))
+    _user = None
+    if "uid" in data and "pwd" in data:
+        _user = dao_users.get_auth(data["uid"], data["pwd"])
     if _user is not None:
         login_user(_user)
     uid = None if current_user.is_anonymous else str(current_user.id)
@@ -28,10 +30,6 @@ def logout():
     logout_user()
     return jsonify({"logged": current_user.is_authenticated})
 
-
-@app.route("/")
-def index():
-    return send_from_directory(DATA_FP, "index.html")
 
 @app.route("/api/words", methods=["GET"])
 @login_required
@@ -64,3 +62,11 @@ def serve(word):
             datasource = sorted(datasources, reverse=True)[0]
 
     return jsonify({"htmlcontent": raw, "processed": processed, "datasource": datasource})
+
+
+@app.route("/createuser/<u>/<p>")
+@login_required
+def createuser(u, p):
+    if dao_users.add_user(u, p):
+        return f"Hello, {u}"
+    return ""

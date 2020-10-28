@@ -7,14 +7,8 @@ import sqlalchemy
 import redis
 
 
-BASE_FP = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-DATA_FP = os.path.join(BASE_FP, "front", "build")
-
 login_manager = flask_login.LoginManager()
-app = flask.Flask(
-    __name__,
-    static_folder=os.path.join(DATA_FP, "static")
-)
+app = flask.Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 login_manager.init_app(app)
 
@@ -25,7 +19,7 @@ except Exception as e:
     if "redis_client" in globals():
         redis_client.close()
     print(e)
-    print("Using dummy daos, no data to be read or written.")
+    print("Using dummy cache...")
     cache = dao.DummyCache()
 
 try:
@@ -41,12 +35,9 @@ except Exception as e:
     if "db_engine" in globals():
         db_engine.dispose()
     print(e)
-    print("Using dummy daos, no data to be read or written.")
+    print("Using dummy daos, no data to be read or written...")
     dao_users = dao.UsersDummyDAO(User)
     dao_defsrc = dao.DefinitionSrcDummyDAO(cache)
-
-# !!!!!!!!!!!!!!! DEV DEV DEV !!!!!!!!!!!!!!!
-dao_users.add_user("0", "0")
 
 
 @login_manager.user_loader

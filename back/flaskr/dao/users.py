@@ -37,14 +37,14 @@ class UsersDAO:
         try:
             with self.engine.connect() as conn:
                 s = USERS.insert().values(uid=uid, password=HASH(pwd))
-                conn.execute(s)
+                return conn.execute(s)
         except sqlalchemy.exc.IntegrityError:
             pass
 
     def del_user(self, uid):
         with self.engine.connect() as conn:
             s = USERS.delete().where(USERS.c.uid == uid)
-            conn.execute(s)
+            return conn.execute(s)
 
 
 class UsersDummyDAO:

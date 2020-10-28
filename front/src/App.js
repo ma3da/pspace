@@ -17,8 +17,6 @@ function load(word, setRaw, setProcessed, setSource, setLogged) {
       })
       .catch(err => {
         console.log(err);
-        // setRaw("Could not fetch raw definition.");
-        // setProcessed("Could not fetch slim definition.");
         setRaw(null);
         setProcessed(null);
         setSource("?");
@@ -48,10 +46,10 @@ function updateLogged(setLogged) {
        .catch(console.log);
 }
 
-function logIn(pwd, setLogged) {
+function logIn(uid, pwd, setLogged) {
   axios
     .post("/login",
-        {"pwd": pwd},
+          {uid: uid, pwd: pwd},
         {headers: {"X-CSRFToken": Cookies.get("csrftoken")}})
     .then(resp => {
       setLogged(resp.data);
@@ -71,16 +69,18 @@ function logOut(setLogged) {
 }
 
 function Logging(props) {
+  const [uid, setUid] = useState("");
   const [pwd, setPwd] = useState("");
-  const pwdRef = useRef(null);
-  useEffect(() => {pwdRef.current.focus();});
+  const uidRef = useRef(null);
+  useEffect(() => {if (!uid && !pwd) uidRef.current.focus();});
   return (
+          <form action="javascript:void(0);">
     <div id="logging">
-      <form action="javascript:void(0);">
-        <input type="password" name="pwd" onChange={e => setPwd(e.target.value)} ref={pwdRef} />
-        <button onClick={() => {logIn(pwd, props.setLogged); props.popclose();}}>log in</button>
-      </form>
+        <input name="uid" onChange={e => setUid(e.target.value)} ref={uidRef} />
+        <input type="password" name="pwd" onChange={e => setPwd(e.target.value)} />
+          <button onClick={() => {logIn(uid, pwd, props.setLogged); props.popclose();}}>log in</button>
     </div>
+          </form>
   );
 }
 
@@ -88,10 +88,12 @@ function Pop(props) {
   if (props.queue.length > 0) {
     return (
       <div className="pop-container">
-        <div className="pop-content">
+        <div className="pop-center">
+          <div className="pop-content">
           {props.queue[0]}
+          </div>
+          <div><button onClick={props.close}>close</button></div>
         </div>
-      <div><button onClick={props.close}>close</button></div>
       </div>
     );
   }

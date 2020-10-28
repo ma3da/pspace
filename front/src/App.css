@@ -73,13 +73,31 @@ html, body, #root {
   right: 0px;
 
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
+.pop-center {
+    background-color: lightgrey;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .pop-content {
   padding: 2em;
-  background-color: black;
-  color: white;
+}
+
+#logging {
+    display: flex;
+    flex-direction: column;
+}
+
+#logging input {
+    margin: .5em;
+}
+
+#logging button {
+    margin: .5em;
 }
