@@ -145,7 +145,6 @@ function App() {
   const [process, setProcess] = useState(false); // == checkbox state at start?
   const [popQueue, setPopQueue] = useState([]);
   const [logged, setLogged] = useState(null); // {logged, username}
-  const searchRef = useRef(null);
 
   const close = () => setPopQueue((prev) => {return prev.slice(1);});
   const _load = () => load(word, setDefRawHtml, setDefProcessed, setDataSrc, setLogged);
@@ -153,7 +152,6 @@ function App() {
   const _loadWords = () => loadWords(setWordList, setLogged);
 
   if (logged === null) updateLogged(setLogged);
-  useEffect(() => {if (popQueue.length === 0) searchRef.current.focus();});
   const spanUserInfo = logged && logged.logged ? <span className="info-item">logged as: {logged.username}</span> : null;
 
   return (
@@ -178,7 +176,7 @@ function App() {
         <form action="javascript:void(0);">
           <label>
           <input type="checkbox" onChange={e => setProcess(e.target.checked)} />slim</label>
-          <input onChange={e => setWord(e.target.value)} ref={searchRef} />
+          <input onChange={e => setWord(e.target.value)} />
           <button onClick={_load}><FontAwesomeIcon icon={faSearch} /></button>
         </form>
       </div>
