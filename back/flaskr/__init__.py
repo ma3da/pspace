@@ -19,11 +19,7 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 login_manager.init_app(app)
 
 try:
-    import flaskr.nocommit.hiddensettings as hs
-
-    host = os.environ.get("PSPACE_CACHE_HOST", hs.CACHE_HOST)
-    port = os.environ.get("PSPACE_CACHE_PORT", hs.CACHE_PORT)
-    redis_client = redis.Redis(host=host, port=port)
+    redis_client = redis.Redis(**dao.util.find_params_dict("host", "port", namespace="CACHE"))
     cache = dao.Cache(redis_client)
 except Exception as e:
     if "redis_client" in globals():
@@ -33,13 +29,8 @@ except Exception as e:
     cache = dao.DummyCache()
 
 try:
-    import flaskr.nocommit.hiddensettings as hs
-
-    dbname = os.environ.get("PSPACE_DB_NAME", hs.DB_NAME)
-    user = os.environ.get("PSPACE_DB_USER", hs.DB_USER)
-    pwd = os.environ.get("PSPACE_DB_PWD", hs.DB_PWD)
-    host = os.environ.get("PSPACE_DB_HOST", hs.DB_HOST)
-    port = os.environ.get("PSPACE_DB_PORT", hs.DB_PORT)
+    dbname, user, pwd, host, port = \
+        dao.util.find_params("name", "user", "pwd", "host", "port", namespace="DB")
 
     db_engine = sqlalchemy.create_engine(
         f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{dbname}")
