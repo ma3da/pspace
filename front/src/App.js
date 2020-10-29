@@ -152,7 +152,7 @@ function App() {
   const _loadWords = () => loadWords(setWordList, setLogged);
 
   if (logged === null) updateLogged(setLogged);
-  const spanUserInfo = logged && logged.logged ? <span className="info-item">logged as: {logged.username}</span> : null;
+  const spanUserInfo = logged && logged.logged ? <span className="info-item">[{logged.username}]</span> : null;
 
   return (
   <div id="definition-main">
@@ -169,13 +169,12 @@ function App() {
         <LogToggle setQueue={setPopQueue} logged={logged} setLogged={setLogged} close={close} />
         </span>
         {spanUserInfo}
-        <span className="info-item">source: {dataSource}</span>
       </div>
           <ShowToggle load={_loadWords} unload={() => setWordList([])} />
       <div className="searchbar-tools">
         <form action="javascript:void(0);">
           <label>
-          <input type="checkbox" onChange={e => setProcess(e.target.checked)} />slim</label>
+          <input type="checkbox" onChange={e => setProcess(e.target.checked)} /></label>
           <input onChange={e => setWord(e.target.value)} />
           <button onClick={_load}><FontAwesomeIcon icon={faSearch} /></button>
         </form>
