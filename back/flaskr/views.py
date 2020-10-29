@@ -65,11 +65,12 @@ def serve(word):
         else: # local or remote
             datasource = sorted(datasources, reverse=True)[0]
 
+    logger.debug(f"serving '{word}' from {datasource}")
+
     return jsonify({"htmlcontent": raw, "processed": processed, "datasource": datasource})
 
 
 @app.route("/createuser/<u>/<p>")
-@login_required
 def createuser(u, p):
     if dao_users.add_user(u, p):
         logger.debug(f"creating user {u}: success")
