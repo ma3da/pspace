@@ -32,6 +32,24 @@ html, body, #root {
     padding-top: 2em;
 }
 
+.definition-group {
+    margin-bottom:1em;
+    margin-top:1em;
+    border: 1px solid grey;
+}
+
+.definition-subgroup{
+    padding: 1em;
+}
+
+.definition-line {
+    margin-bottom: .5em;
+}
+
+.definition-synt {
+    font-style:italic;
+}
+
 .wordlist {
     display: flex;
     flex-direction: row;

@@ -116,9 +116,38 @@ function WordList(props){
     return words ? <div className="wordlist"> {words} </div> : null;
 }
 
+function parseSubDef(o, d=0) {
+    if (Array.isArray(o)) {
+        const classname = d === 0 ? "definition-group" : "definition-subgroup";
+        return (
+            <div className={classname}>
+                {o.map(x => parseSubDef(x, d+1))}
+            </div>
+        );
+    }
+    if (o.type === "def") {
+        return <div className="definition-line">{o.def}</div>;
+    } else if (o.type === "synt") {
+        return <div className="definition-line"><span className="definition-synt">{o.synt}</span> {o.def}</div>;
+    } else {
+        return null;
+    }
+}
+
+function SubDefinition(props){
+    return (
+        <div className="definition">
+            <div>{props.word}</div>
+            <div>{parseSubDef(props.defs)}</div>
+        </div>
+    );
+}
+
 function processDefinition(def) {
-    return def ? <div className="definition" dangerouslySetInnerHTML={{__html: def}} />
-               : <div className="definition">Could not fetch slim definition.</div>;
+    if (!def) return <div className="definition">Could not fetch slim definition.</div>;
+
+    const groups = Object.entries(def).map(([k, v]) => <SubDefinition word={k} defs={v} />);
+    return <div>{groups}</div>;
 }
 
 function Definition(props){
