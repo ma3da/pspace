@@ -1,4 +1,5 @@
 from .util import do_nothing
+import json
 
 class Cache:
     key_src = "src"
@@ -25,9 +26,12 @@ class Cache:
         return self._set(word, self.key_src, src)
 
     def get_processed(self, word):
-        return self._get(word, self.key_processed)
+        result = self._get(word, self.key_processed)
+        if result is not None:
+            return json.loads(result)
 
     def set_processed(self, word, processed):
+        processed = json.dumps(processed)
         return self._set(word, self.key_processed, processed)
 
     def get_raw(self, word):

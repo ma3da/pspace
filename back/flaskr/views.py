@@ -51,12 +51,12 @@ def serve(word):
 
         raw = dao_defsrc.cache.get_raw(word)
         if raw is None:
-            raw, _ds = defv.get_definition_html(word, defv.to_raw_html)
+            raw, _ds = defv.get_definition(word, defv.to_raw_html, raw=True)
             datasources.append(_ds)
             dao_defsrc.cache.set_raw(word, raw)
         processed = dao_defsrc.cache.get_processed(word)
         if processed is None:
-            processed, _ds = defv.get_definition_html(word, defv.process_article_src)
+            processed, _ds = defv.get_definition(word, defv.process_article_src, raw=False)
             datasources.append(_ds)
             dao_defsrc.cache.set_processed(word, processed)
 

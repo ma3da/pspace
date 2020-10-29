@@ -8,10 +8,6 @@ import psycopg2
 import os
 
 
-def format_articles(divs):
-    return "<hr>".join(divs)
-
-
 def get_articles_src_already_stored(word):
     src = dao_defsrc.get(word)
     if src is not None:
@@ -40,38 +36,35 @@ def process_article_src(html):
         raise ValueError(f"Expected to find exactly one word, found: {word}")
     word = word[0]
 
-    def convert(tag_iter, current):
-        for tag in tag_iter:
-            if has_class(tag, "tlf_cdefinition"):
-                if not tag.find_previous_sibling(class_="tlf_csyntagme") \
-                        and not tag.find_next_sibling(class_="tlf_cdefinition"):
-                    return [tag]
-            if has_class(tag, "tlf_parah"):
-                current.append(convert(tag.children, []))
-        return current
+    def getcls(t):
+        return ".".join(t.get("class", ()))
 
-    tree = convert(article, [])
+    def_obj = {"word": word.text, "defs": []}
+    for parah in filter(lambda t: getcls(t) == "tlf_parah", article.children):
+        group = []
+        waiting = None
+        for t in parah.find_all("span"):
+            cls = getcls(t)
+            text = t.text
+            if cls == "tlf_cdefinition":
+                if waiting:
+                    group.append({"type": "synt", "synt": waiting, "def": text})
+                else:
+                    group.append({"type": "def", "def": text})
+                waiting = None
+            elif cls == "tlf_csyntagme":
+                waiting = text
+            else:
+                waiting = None
+        def_obj["defs"].append(group)
 
-    def flatten(node):
-        if isinstance(node, bs4.element.Tag):
-            return str(node)
-        # list | None
-        if not node:
-            return None
-        flattened = list(filter(lambda s: s is not None, map(flatten, node)))
-        if not flattened:
-            return None
-        elif len(flattened) == 1:
-            return flattened[0]
-        else:
-            return f"<ul>{''.join(map(lambda s: f'<li>{s}</li>', flattened))}</ul>"
-
-    return f"<p>{word}</p><div>{flatten(tree)}</div>"
+    return def_obj
 
 
-def get_definition_html(word, process_fn):
-    """For the given word, return html code to embed.
-    :returns: (str, str): html code, data source (local/remote)
+def get_definition(word, process_fn, raw):
+    """For the given word, return code to embed: if raw, a string of html, else,
+    a dict to be parsed by the client.
+    :returns: (str|dict, str): definition, data source (local/remote)
     """
     word = word.lower()
     base_url = "https://www.cnrtl.fr/definition"
@@ -98,7 +91,10 @@ def get_definition_html(word, process_fn):
             articles_src.append(resp.content.decode("utf8"))
         dao_defsrc.write(word, json.dumps(articles_src))
 
-    return format_articles(map(process_fn, articles_src)), source
+    if raw:
+        return "<hr>".join(map(process_fn, articles_src)), source
+    else:
+        return {d["word"]: d["defs"] for d in map(process_fn, articles_src)}, source
 
 
 def check_input(word):
