@@ -135,10 +135,15 @@ function parseSubDef(o, d=0) {
 }
 
 function SubDefinition(props){
+    const wo = props.wordObj;
+    const version = wo.version ? <sup>{wo.version}</sup>: null;
     return (
         <div className="definition">
-            <div>{props.word}</div>
-            <div>{parseSubDef(props.defs)}</div>
+            <div className="definition-word">
+            <span>{wo.word}{version}</span>
+            <span>{wo.code}</span>
+            </div>
+            <div>{parseSubDef(wo.defs)}</div>
         </div>
     );
 }
@@ -146,7 +151,7 @@ function SubDefinition(props){
 function processDefinition(def) {
     if (!def) return <div className="definition">Could not fetch slim definition.</div>;
 
-    const groups = Object.entries(def).map(([k, v]) => <SubDefinition word={k} defs={v} />);
+    const groups = def.map((wo) => <SubDefinition wordObj={wo} />);
     return <div>{groups}</div>;
 }
 

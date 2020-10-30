@@ -34,12 +34,17 @@ html, body, #root {
 
 .definition-group {
     margin-bottom:1em;
-    margin-top:1em;
     border: 1px solid grey;
 }
 
 .definition-subgroup{
     padding: 1em;
+}
+
+.definition-word {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .definition-line {

@@ -6,6 +6,9 @@ import operator
 import json
 import psycopg2
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_articles_src_already_stored(word):
@@ -24,23 +27,46 @@ def to_raw_html(html):
     return "<br>".join(map(str, article)) if article else ""
 
 
-def process_article_src(html):
+def get_wordinfo(article):
+    _word = article.find_all("div", class_="tlf_cvedette")
+    if len(_word) != 1:
+        raise ValueError(f"Expected to find exactly one word, found: {_word}")
+    word = _word[0].find("span", class_="tlf_cmot")
+    code = _word[0].find("span", class_="tlf_ccode")
+    version = None
+    if word:
+        c = word.contents
+        if c:
+            word = c[0]
+            if len(c) > 1:
+                x = c[1]
+                x = str(x).strip()
+                match = re.compile("<sup>(.*)</sup>").fullmatch(x)
+                if match:
+                    version = int(match.group(1).strip())
+            if word[-1] == ",":
+                word = word[:-1]
+        else:
+            raise ValueError(f"No word content found for: {word}")
+    else:
+        word = None
+    return word, version, code.text if code else None
+
+def process_article_src(html) -> dict:
     soup = bs4.BeautifulSoup(html, "html.parser")
     article = soup.find("div", id=re.compile("^art"))
 
     if not article:
-        return ""
+        return {}
 
-    word = article.find_all("div", class_="tlf_cvedette")
-    if len(word) != 1:
-        raise ValueError(f"Expected to find exactly one word, found: {word}")
-    word = word[0]
+    word, version, code = get_wordinfo(article)
 
     def getcls(t):
-        return ".".join(t.get("class", ()))
+        return " ".join(t.get("class", ()))
 
-    def_obj = {"word": word.text, "defs": []}
-    for parah in filter(lambda t: getcls(t) == "tlf_parah", article.children):
+    def_obj = {"word": word, "version": version, "code": code, "defs": []}
+    for parah in filter(lambda t: isinstance(t, bs4.Tag) and getcls(t) == "tlf_parah",
+                        article.children):
         group = []
         waiting = None
         for t in parah.find_all("span"):
@@ -94,7 +120,7 @@ def get_definition(word, process_fn, raw):
     if raw:
         return "<hr>".join(map(process_fn, articles_src)), source
     else:
-        return {d["word"]: d["defs"] for d in map(process_fn, articles_src)}, source
+        return list(map(process_fn, articles_src)), source
 
 
 def check_input(word):
