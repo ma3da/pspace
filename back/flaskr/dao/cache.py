@@ -1,5 +1,15 @@
 from .util import do_nothing
+from typing import Iterator
 import json
+
+
+def _decode(val):
+    """ bytes -> 'decoded str', * -> * """
+    if val is not None:
+        if isinstance(val, bytes):
+            return val.decode("utf8")
+        return val
+
 
 class Cache:
     key_src = "src"
@@ -10,11 +20,10 @@ class Cache:
         self.client = client
 
     def _get(self, hsh, key):
-        r = self.client.hget(hsh, key)
-        if r is not None:
-            if isinstance(r, bytes):
-                r = r.decode("utf8")
-            return r
+        return _decode(self.client.hget(hsh, key))
+
+    def _mget(self, hsh, keys) -> Iterator:
+        return map(_decode, self.client.hmget(hsh, keys))
 
     def _set(self, hsh, key, val):
         return self.client.hset(hsh, key, val)
@@ -39,6 +48,14 @@ class Cache:
 
     def set_raw(self, word, raw):
         return self._set(word, self.key_raw, raw)
+
+    def get_both(self, word):
+        """-> (raw, processed)"""
+        r, p =  self._mget(word, (self.key_raw, self.key_processed))
+        if p is not None:
+            p = json.loads(p)
+        return r, p
+
 
 
 class DummyCache:
