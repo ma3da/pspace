@@ -1,6 +1,8 @@
 from .util import do_nothing
 from typing import Iterator
 import json
+import time
+import functools
 
 
 def _decode(val):
@@ -11,6 +13,14 @@ def _decode(val):
         return val
 
 
+def record_access(f):
+    @functools.wraps(f)
+    def wrapper(self, *args, **kwargs):
+        self._last_access = time.perf_counter()
+        return f(self, *args, **kwargs)
+    return wrapper
+
+
 class Cache:
     key_src = "src"
     key_processed = "proc"
@@ -18,10 +28,20 @@ class Cache:
 
     def __init__(self, client):
         self.client = client
+        self._last_access = time.perf_counter()
 
+    @property
+    def last_access(self):
+        return self._last_access
+
+    def elapsed_since_last_access(self) :
+        return time.perf_counter() - self._last_access
+
+    @record_access
     def _get(self, hsh, key):
         return _decode(self.client.hget(hsh, key))
 
+    @record_access
     def _mget(self, hsh, keys) -> Iterator:
         return map(_decode, self.client.hmget(hsh, keys))
 

@@ -7,6 +7,7 @@ import logging
 
 
 logger = logging.getLogger(__name__)
+ANONYMOUS_WAIT = 10
 
 
 @app.route("/login", methods=["POST"])
@@ -36,37 +37,31 @@ def logout():
 
 
 @app.route("/api/words", methods=["GET"])
-@login_required
 def send_words():
     return jsonify(list(dao_defsrc.iter_words(limit=20)))
 
 
 @app.route("/api/<word>", methods=["GET"])
 def serve(word):
-    if not current_user.is_authenticated:
-        raw, processed = dao_defsrc.cache.get_both(word)
-        return jsonify({"htmlcontent": raw, "processed": processed, "datasource": "cache"})
+    word = word.strip()
+    if not defv.check_input(word):
+        return {}
 
+    anon_allowed = dao_defsrc.cache.elapsed_since_last_access() > ANONYMOUS_WAIT
     raw, processed, datasource = None, None, None
-    if defv.check_input(word):
+    raw, processed = dao_defsrc.cache.get_both(word)
+    print(anon_allowed)
+    if raw or processed:
+        datasource = "cache"
+    elif current_user.is_authenticated or anon_allowed:
         datasources = []
-        word = word.strip()
-
-        raw = dao_defsrc.cache.get_raw(word)
-        if raw is None:
-            raw, _ds = defv.get_definition(word, defv.to_raw_html, raw=True)
-            datasources.append(_ds)
-            dao_defsrc.cache.set_raw(word, raw)
-        processed = dao_defsrc.cache.get_processed(word)
-        if processed is None:
-            processed, _ds = defv.get_definition(word, defv.process_article_src, raw=False)
-            datasources.append(_ds)
-            dao_defsrc.cache.set_processed(word, processed)
-
-        if not datasources:
-            datasource = "cache"
-        else: # local or remote
-            datasource = sorted(datasources, reverse=True)[0]
+        raw, _ds = defv.get_definition(word, defv.to_raw_html, raw=True)
+        datasources.append(_ds)
+        dao_defsrc.cache.set_raw(word, raw)
+        processed, _ds = defv.get_definition(word, defv.process_article_src, raw=False)
+        datasources.append(_ds)
+        dao_defsrc.cache.set_processed(word, processed)
+        datasource = sorted(datasources, reverse=True)[0]  # local or remote
 
     logger.debug(f"serving '{word}' from {datasource}")
 
