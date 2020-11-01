@@ -3,22 +3,28 @@ import flask_login
 import os
 import flaskr.dao as dao
 from flaskr.user import User
+from . import config
 import sqlalchemy
 import redis
 import logging
 
+BACK_FP = os.path.dirname(os.path.dirname(__file__))
+CONF_FP = os.path.join(BACK_FP, "conf")
+LOG_FP = os.path.join(BACK_FP, "back.log")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(__file__)), "back.log"))
+handler = logging.FileHandler(LOG_FP)
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 logger.info("starting...")
+config.load_config(CONF_FP if os.path.exists(CONF_FP) else None)
 login_manager = flask_login.LoginManager()
 app = flask.Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = config.get("SECRET_KEY", _raise=True)
 login_manager.init_app(app)
 
 try:
