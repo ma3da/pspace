@@ -52,6 +52,13 @@ def get_wordinfo(article):
         word = None
     return word, version, code.text if code else None
 
+def build_definition(body, synt=None):
+    """build definition (minimal block) object from parsed html"""
+    base = {"type": "def", "def": body}
+    if synt:
+        base.update({"type": "synt", "synt": synt})
+    return base
+
 def process_article_src(html) -> dict:
     soup = bs4.BeautifulSoup(html, "html.parser")
     article = soup.find("div", id=re.compile("^art"))
@@ -73,10 +80,7 @@ def process_article_src(html) -> dict:
             cls = getcls(t)
             text = t.text
             if cls == "tlf_cdefinition":
-                if waiting:
-                    group.append({"type": "synt", "synt": waiting, "def": text})
-                else:
-                    group.append({"type": "def", "def": text})
+                group.append(build_definition(body=text, synt=waiting))
                 waiting = None
             elif cls == "tlf_csyntagme":
                 waiting = text
