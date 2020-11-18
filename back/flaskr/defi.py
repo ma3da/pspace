@@ -7,9 +7,11 @@ import json
 import psycopg2
 import os
 import logging
+import spacy
 
 logger = logging.getLogger(__name__)
 
+nlp = spacy.load("fr_core_news_sm")
 
 def get_articles_src_already_stored(word):
     src = dao_defsrc.get(word)
@@ -54,7 +56,9 @@ def get_wordinfo(article):
 
 def build_definition(body, synt=None):
     """build definition (minimal block) object from parsed html"""
-    base = {"type": "def", "def": body}
+    doc = nlp(body)
+    _body = (f"[{token.text}]" if token.pos_== "NOUN" else token.text for token in doc)
+    base = {"type": "def", "def": " ".join(_body)}
     if synt:
         base.update({"type": "synt", "synt": synt})
     return base
