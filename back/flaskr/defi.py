@@ -46,7 +46,7 @@ def get_wordinfo(article):
                 x = str(x).strip()
                 match = re.compile("<sup>(.*)</sup>").fullmatch(x)
                 if match:
-                    version = int(match.group(1).strip())
+                    version = int(match.group(1).strip()) # todo: can be more than int
             if word[-1] == ",":
                 word = word[:-1]
         else:
@@ -56,9 +56,19 @@ def get_wordinfo(article):
     return word, version, code.text if code else None
 
 
+Word = collections.namedtuple("Word", ["text", "link"])
+
+
+def tok2word(token):
+    return Word(
+        text=token.text,
+        link=token.pos_ == "NOUN"
+    )
+
+
 class Definition(collections.UserList):
     def __init__(self, tokens, word=None, synt=None):
-        super().__init__(tokens)
+        super().__init__(map(tok2word, tokens))
         self.word = word
         self.synt = synt
 
@@ -69,8 +79,7 @@ class Definition(collections.UserList):
     def to_dict(self):
         return {
             "type": self.type,
-            "def": " ".join([f"[{token.text}]" if token.pos_== "NOUN" else token.text
-                             for token in self]),
+            "body": list(map(Word._asdict, self)),
             "synt": self.synt,
         }
 

@@ -116,19 +116,30 @@ function WordList(props){
     return words ? <div className="wordlist"> {words} </div> : null;
 }
 
-function parseSubDef(o, d=0) {
+function parseWordBody(wb, load) {
+    if (!wb) return null;
+    return wb.map(token => token.link
+                  ? <span className="token link" onClick={() => load(token.text)}>{token.text}</span>
+                  : <span className="token">{token.text}</span>
+                 );
+}
+
+function parseSubDef(o, load, d=0) {
     if (Array.isArray(o)) {
         const classname = d === 0 ? "definition-group" : "definition-subgroup";
         return (
             <div className={classname}>
-                {o.map(x => parseSubDef(x, d+1))}
+                {o.map(x => parseSubDef(x, load, d+1))}
             </div>
         );
     }
     if (o.type === "def") {
-        return <div className="definition-line">{o.def}</div>;
+        return <div className="definition-line">{parseWordBody(o.body, load)}</div>;
     } else if (o.type === "synt") {
-        return <div className="definition-line"><span className="definition-synt">{o.synt}</span> {o.def}</div>;
+        return (<div className="definition-line">
+                  <span className="definition-synt">{o.synt}</span>
+                {parseWordBody(o.body, load)}
+                </div>);
     } else {
         return null;
     }
@@ -143,20 +154,20 @@ function SubDefinition(props){
             <span>{wo.word}{version}</span>
             <span>{wo.code}</span>
             </div>
-            <div>{parseSubDef(wo.defs)}</div>
+            <div>{parseSubDef(wo.defs, props.load)}</div>
         </div>
     );
 }
 
-function processDefinition(def) {
+function processDefinition(def, load) {
     if (!def) return <div className="definition">Could not fetch slim definition.</div>;
 
-    const groups = def.map((wo) => <SubDefinition wordObj={wo} />);
+    const groups = def.map((wo) => <SubDefinition wordObj={wo} load={load} />);
     return <div>{groups}</div>;
 }
 
 function Definition(props){
-    if (props.process) return processDefinition(props.processed);
+    if (props.process) return processDefinition(props.processed, props.load);
 
     return props.raw ? <div className="definition" dangerouslySetInnerHTML={{__html: props.raw}} />
                      : <div className="definition">Could not fetch raw definition.</div>;
@@ -193,7 +204,7 @@ function App() {
     <div className="definition-center">
       <div className="definition-content centering">
           <WordList wordlist={wordList} load={_load2} />
-          <Definition process={process} processed={defProcessed} raw={defRawHtml} />
+          <Definition process={process} processed={defProcessed} raw={defRawHtml} load={_load2}/>
       </div>
     </div>
 

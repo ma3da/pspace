@@ -32,6 +32,12 @@ html, body, #root {
     padding-top: 2em;
 }
 
+.definition-word {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .definition-group {
     margin-bottom:1em;
     border: 1px solid grey;
@@ -41,13 +47,10 @@ html, body, #root {
     padding: 1em;
 }
 
-.definition-word {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
 .definition-line {
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     margin-bottom: .5em;
 }
 
@@ -65,6 +68,19 @@ html, body, #root {
 .wordlist-item {
     padding: .8em;
     cursor: pointer;
+}
+
+.token {
+    margin-left: .5em;
+}
+
+.link {
+    cursor: pointer;
+    border-bottom: 1px dotted;
+}
+
+.tlink:hover {
+    border-bottom: 1px solid;
 }
 
 .searchbar {
