@@ -1,4 +1,5 @@
 from flaskr import dao_defsrc
+import collections
 import requests
 import bs4
 import re
@@ -54,14 +55,25 @@ def get_wordinfo(article):
         word = None
     return word, version, code.text if code else None
 
-def build_definition(body, synt=None):
-    """build definition (minimal block) object from parsed html"""
-    doc = nlp(body)
-    _body = (f"[{token.text}]" if token.pos_== "NOUN" else token.text for token in doc)
-    base = {"type": "def", "def": " ".join(_body)}
-    if synt:
-        base.update({"type": "synt", "synt": synt})
-    return base
+
+class Definition(collections.UserList):
+    def __init__(self, tokens, word=None, synt=None):
+        super().__init__(tokens)
+        self.word = word
+        self.synt = synt
+
+    @property
+    def type(self):
+        return "synt" if self.synt else "def"
+
+    def to_dict(self):
+        return {
+            "type": self.type,
+            "def": " ".join([f"[{token.text}]" if token.pos_== "NOUN" else token.text
+                             for token in self]),
+            "synt": self.synt,
+        }
+
 
 def process_article_src(html) -> dict:
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -84,7 +96,7 @@ def process_article_src(html) -> dict:
             cls = getcls(t)
             text = t.text
             if cls == "tlf_cdefinition":
-                group.append(build_definition(body=text, synt=waiting))
+                group.append(Definition(nlp(text), synt=waiting).to_dict())
                 waiting = None
             elif cls == "tlf_csyntagme":
                 waiting = text
