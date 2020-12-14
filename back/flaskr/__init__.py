@@ -22,7 +22,7 @@ logger.addHandler(handler)
 
 logger.info("starting...")
 config.load_config(CONF_FP if os.path.exists(CONF_FP) else None)
-logger.setLevel(getattr(logging, config.get("LOGGING_LEVEL"), logging.DEBUG))
+logger.setLevel(getattr(logging, config.get("LOGGING_LEVEL", "DEBUG")))
 
 app = flask.Flask(__name__)
 app.secret_key = config.get("SECRET_KEY", _raise=True)
