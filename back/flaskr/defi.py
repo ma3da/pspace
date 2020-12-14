@@ -84,6 +84,14 @@ class Definition(collections.UserList):
         }
 
 
+class Group(collections.UserList):
+    @classmethod
+    def create(cls, parent=None):
+        new = cls()
+        new.parent = parent
+        return new
+
+
 def process_article_src(html) -> dict:
     soup = bs4.BeautifulSoup(html, "html.parser")
     article = soup.find("div", id=re.compile("^art"))
@@ -97,20 +105,23 @@ def process_article_src(html) -> dict:
         return " ".join(t.get("class", ()))
 
     def_obj = {"word": word, "version": version, "code": code, "defs": []}
-    for parah in filter(lambda t: isinstance(t, bs4.Tag) and getcls(t) == "tlf_parah",
-                        article.children):
+    for t_root in filter(lambda t: isinstance(t, bs4.Tag), article.children):
         group = []
-        waiting = None
-        for t in parah.find_all("span"):
-            cls = getcls(t)
-            text = t.text
-            if cls == "tlf_cdefinition":
-                group.append(Definition(nlp(text), synt=waiting).to_dict())
-                waiting = None
-            elif cls == "tlf_csyntagme":
-                waiting = text
-            else:
-                waiting = None
+        if getcls(t_root) == "tlf_parah":
+            waiting = None
+            for t in t_root.find_all("span"):
+                cls = getcls(t)
+                text = t.text
+                if cls == "tlf_cdefinition":
+                    group.append(Definition(nlp(text), synt=waiting).to_dict())
+                    waiting = None
+                elif cls == "tlf_csyntagme":
+                    waiting = text
+                else:
+                    waiting = None
+        elif getcls(t_root) == "tlf_cdefinition":
+            group.append(Definition(nlp(t_root.text), synt=None).to_dict())
+
         def_obj["defs"].append(group)
 
     return def_obj

@@ -36,6 +36,9 @@ def logout():
     return jsonify({"logged": current_user.is_authenticated})
 
 
+################################ Word API ################################
+
+
 @app.route("/api/words", methods=["GET"])
 def send_words():
     return jsonify(list(dao_defsrc.iter_words(limit=20)))
@@ -50,7 +53,6 @@ def serve(word):
     anon_allowed = dao_defsrc.cache.elapsed_since_last_access() > ANONYMOUS_WAIT
     raw, processed, datasource = None, None, None
     raw, processed = dao_defsrc.cache.get_both(word)
-    print(anon_allowed)
     if raw or processed:
         datasource = "cache"
     elif current_user.is_authenticated or anon_allowed:
@@ -68,6 +70,9 @@ def serve(word):
     return jsonify({"htmlcontent": raw, "processed": processed, "datasource": datasource})
 
 
+############################## DEBUG ##############################
+
+
 @app.route("/createuser/<u>/<p>")
 def createuser(u, p):
     if dao_users.add_user(u, p):
@@ -75,3 +80,26 @@ def createuser(u, p):
         return f"Hello, {u}"
     logger.debug(f"creating user {u}: failure")
     return ""
+
+
+@app.route("/refresh/<word>", methods=["GET"])
+def recompute_and_serve(word):
+    word = word.strip()
+    if not defv.check_input(word):
+        return {}
+
+    anon_allowed = dao_defsrc.cache.elapsed_since_last_access() > ANONYMOUS_WAIT
+    raw, processed, datasource = None, None, None
+    if current_user.is_authenticated or anon_allowed:
+        datasources = []
+        raw, _ds = defv.get_definition(word, defv.to_raw_html, raw=True)
+        datasources.append(_ds)
+        dao_defsrc.cache.set_raw(word, raw)
+        processed, _ds = defv.get_definition(word, defv.process_article_src, raw=False)
+        datasources.append(_ds)
+        dao_defsrc.cache.set_processed(word, processed)
+        datasource = sorted(datasources, reverse=True)[0]  # local or remote
+
+    logger.debug(f"serving '{word}' from {datasource}")
+
+    return jsonify({"htmlcontent": raw, "processed": processed, "datasource": datasource})
