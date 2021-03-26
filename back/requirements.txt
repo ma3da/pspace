@@ -31,7 +31,7 @@ pyflakes==2.2.0
 pyre-check==0.0.58
 pyre-extensions==0.0.19
 pywatchman==1.4.1
-PyYAML==5.3.1
+PyYAML==5.4
 redis==3.5.3
 requests==2.24.0
 soupsieve==2.0.1
